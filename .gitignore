@@ -1,0 +1,17 @@
+# This repository is for organization profile only
+# No build artifacts or temporary files expected
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.log
