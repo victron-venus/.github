@@ -22,7 +22,6 @@ This organization hosts projects focused on:
 ### Monitoring & Visualization
 
 - [inverter-dashboard](https://github.com/victron-venus/inverter-dashboard) - Real-time web dashboard (Python/FastAPI)
-- [inverter-dashboard-go](https://github.com/victron-venus/inverter-dashboard-go) - Real-time web dashboard (Go)
 - [inverter-monitoring](https://github.com/victron-venus/inverter-monitoring) - Telegraf + InfluxDB + Grafana stack
 
 ### Hardware Integration
