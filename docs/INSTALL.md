@@ -81,7 +81,7 @@ esphome run jbd-bms-mqtt.yaml
 
 ## 5. Dashboard
 
-### Recommended: Go binary on Cerbo
+### Go binary on Cerbo
 
 ```bash
 # On Cerbo (ARM example — pick asset from releases)
@@ -104,6 +104,20 @@ docker run -d --name inverter-dashboard \
 ### Desktop client
 
 Download from [inverter-desktop releases](https://github.com/victron-venus/inverter-desktop/releases) and set MQTT host to Cerbo.
+
+Follow instructions [Installation](https://github.com/victron-venus/inverter-desktop#installation)
+
+### android client
+
+Download from [inverter-desktop releases](https://github.com/victron-venus/inverter-desktop/releases) and set MQTT host to Cerbo.
+
+Follow instructions [android Installation](https://github.com/victron-venus/inverter-desktop#android-installation)
+
+### iOS client
+
+Download from [inverter-desktop releases](https://github.com/victron-venus/inverter-desktop/releases) and set MQTT host to Cerbo.
+
+Follow instructions [iOS Installation](https://github.com/victron-venus/inverter-desktop#ios-installation)
 
 ## 6. Monitoring stack (optional)
 
