@@ -25,7 +25,7 @@ flowchart TB
 
     subgraph UI["Monitoring & dashboards"]
         IC -->|"MQTT inverter/state"| MQTT["MQTT broker"]
-        MQTT --> DGO["inverter-dashboard-go\n(Go binary)"]
+        MQTT --> DGO["inverter-dashboard-go\n(primary Cerbo binary)"]
         MQTT --> DPY["inverter-dashboard\n(Docker / alvit/inverter-dashboard)"]
         MQTT --> DT["inverter-desktop\n(Tauri client)"]
         MQTT --> MON["inverter-monitoring\n(TIG stack)"]
@@ -57,7 +57,7 @@ flowchart TB
 | [inverter-desktop](https://github.com/victron-venus/inverter-desktop) | Native Tauri desktop/mobile client |
 | [inverter-monitoring](https://github.com/victron-venus/inverter-monitoring) | Telegraf + InfluxDB + Grafana stack |
 | [integration-tests](https://github.com/victron-venus/integration-tests) | MQTT / battery / PV integration test harness |
-| [terraform-github](https://github.com/4alvit/terraform-github) | Terraform for org repos, branch rules, and policies |
+| [terraform-github](https://github.com/victron-venus/terraform-github) | Terraform for org repos, branch rules, and policies |
 | [.github](https://github.com/victron-venus/.github) | Organization profile and shared docs (this repo) |
 
 ### Dashboard choice
