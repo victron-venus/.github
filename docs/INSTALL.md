@@ -81,10 +81,10 @@ esphome run jbd-bms-mqtt.yaml
 
 ## 5. Dashboard
 
-### Go binary on Cerbo
+### Go binary on Mac OS/Linux/Raspbery Pi
 
 ```bash
-# On Cerbo (ARM example — pick asset from releases)
+# On Raspberry Pi(ARM example — pick asset from releases)
 wget https://github.com/victron-venus/inverter-dashboard-go/releases/latest/download/inverter-dashboard-raspberry-pi3
 chmod +x inverter-dashboard-raspberry-pi3
 ./inverter-dashboard-raspberry-pi3
