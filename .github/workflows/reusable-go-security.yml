@@ -15,7 +15,7 @@ on:
         required: false
     secrets:
       GITHUB_TOKEN:
-        required: true
+        required: false
 
 permissions:
   contents: read

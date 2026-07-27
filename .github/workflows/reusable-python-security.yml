@@ -13,9 +13,6 @@ on:
         type: string
         default: '.'
         required: false
-    secrets:
-      GITHUB_TOKEN:
-        required: true
 
 permissions:
   contents: read

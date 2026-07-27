@@ -20,7 +20,7 @@ on:
         required: false
     secrets:
       GITHUB_TOKEN:
-        required: true
+        required: false
 
 permissions:
   contents: read
@@ -50,7 +50,7 @@ jobs:
           python-version: ${{ inputs.python-version }}
 
       - name: Install Ruff
-        run: pip install --only-binary :all: ruff==0.11.0
+        run: pip install --only-binary ":all:" ruff==0.11.0
 
       - name: Run Ruff check
         run: |
