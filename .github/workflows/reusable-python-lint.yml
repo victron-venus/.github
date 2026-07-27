@@ -1,0 +1,74 @@
+name: Reusable Python Lint (Ruff)
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        description: 'Python version to use'
+        type: string
+        default: '3.13'
+        required: false
+      working-directory:
+        description: 'Working directory for the project'
+        type: string
+        default: '.'
+        required: false
+      args:
+        description: 'Additional arguments to pass to ruff check'
+        type: string
+        default: ''
+        required: false
+    secrets:
+      GITHUB_TOKEN:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  ruff-lint:
+    name: Python Lint (Ruff)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    permissions:
+      contents: read
+      checks: write
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Install Ruff
+        run: pip install --only-binary ":all:" ruff==0.11.0
+
+      - name: Run Ruff check
+        run: |
+          ruff check . ${{ inputs.args }}
+
+      - name: Run Ruff format check
+        run: |
+          ruff format --check . ${{ inputs.args }}
+
+      - name: Comment PR with results
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ **Ruff lint failed!** Please fix the linting errors before merging.'
+            })

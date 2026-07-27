@@ -1,0 +1,72 @@
+name: Reusable Python Security Scan (Bandit)
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        description: 'Python version to use'
+        type: string
+        default: '3.13'
+        required: false
+      working-directory:
+        description: 'Working directory for the project'
+        type: string
+        default: '.'
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  python-security:
+    name: Python Security Scan (Bandit)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Install security tools
+        run: |
+          pip install --only-binary :all: bandit==1.9.4
+
+      - name: Run Bandit security linter
+        run: |
+          set +e
+          bandit -r . -f json -o bandit-results.json 2>/dev/null
+          set -e
+
+          python3 -c "
+          import json
+          sarif = {'version': '2.1.0', '\$schema': 'https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/sarif-2.1.0-obj.json', 'runs': [{'tool': {'driver': {'name': 'Bandit', 'version': '1.0.0', 'informationUri': 'https://bandit.readthedocs.io/', 'rules': []}}, 'results': []}]}
+          try:
+              with open('bandit-results.json') as f:
+                  data = json.load(f)
+              for r in data.get('results', []):
+                  sarif['runs'][0]['results'].append({'ruleId': r.get('test_id', ''), 'message': {'text': r.get('issue_text', '')}, 'locations': [{'physicalLocation': {'artifactLocation': {'uri': r.get('filename', '')}, 'region': {'startLine': r.get('line_number', 0)}}}], 'level': 'warning'})
+          except Exception:
+              pass
+          with open('bandit-results.sarif', 'w') as f:
+              json.dump(sarif, f)
+          "
+
+      - name: Upload Bandit results
+        uses: github/codeql-action/upload-sarif@7fd177fa680c9881b53cdab4d346d32574c9f7f4 # v3.35.4
+        with:
+          sarif_file: bandit-results.sarif
+          category: python-bandit

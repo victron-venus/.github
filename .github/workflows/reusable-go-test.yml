@@ -1,0 +1,65 @@
+name: Reusable Go Test
+
+on:
+  workflow_call:
+    inputs:
+      go-version-file:
+        description: 'Path to go.mod file for version detection'
+        type: string
+        default: 'go.mod'
+        required: false
+      working-directory:
+        description: 'Working directory for the project'
+        type: string
+        default: '.'
+        required: false
+      args:
+        description: 'Additional arguments to pass to go test'
+        type: string
+        default: '-v -race -coverprofile=coverage.out ./...'
+        required: false
+    secrets:
+      CODECOV_TOKEN:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  go-test:
+    name: Go Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: ${{ inputs.go-version-file }}
+
+      - name: Download Go dependencies
+        run: go mod download
+
+      - name: Run Go tests
+        run: |
+          go test ${{ inputs.args }}
+
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@9a997c8b86836e0d5963e3ed859a43af9b5bdabf # v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: .
+          flags: unittests
+          files: ./coverage.out
