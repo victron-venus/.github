@@ -19,8 +19,8 @@ on:
         default: '-v -race -coverprofile=coverage.out ./...'
         required: false
     secrets:
-      GITHUB_TOKEN:
-        required: true
+      CODECOV_TOKEN:
+        required: false
 
 permissions:
   contents: read
