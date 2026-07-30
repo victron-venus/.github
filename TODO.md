@@ -85,14 +85,6 @@ Audit log of all D-Bus commands and inverter state transitions with chronology, 
 - [ ] Mobile-specific UI adaptations (touch targets, safe areas)
 - [ ] Offline-first data sync with background queue
 - [ ] Biometric authentication for sensitive actions
-- **Branches pushed (all rebased onto main, ready for PR):**
-  - `feat/startup-system-notifications`
-  - `feature/mqtt-ha-config`
-  - `feature/readme-updates`
-  - `fix/ha-entities-and-auth-v2`
-  - `fix/ios-github-actions`
-  - `fix/readme-english-only`
-  - `fix/sonarqube-issues-2024-07-24`
 
 ### 8. inverter-control (Victron ESS Grid-Zero Controller Daemon)
 **Status:** Active | **Target:** Cerbo GX / local server daemon
@@ -125,7 +117,6 @@ Audit log of all D-Bus commands and inverter state transitions with chronology, 
 - [ ] Support multiple Tasmota device templates (Shelly, Gosund, etc.)
 - [ ] D-Bus service auto-registration on Venus OS
 - [ ] MQTT discovery for Home Assistant integration
-- **Branch pushed:** `review/code-quality` — **PR ready to create**
 
 ### 11. esphome-jbd-bms-mqtt (ESP32 BLE Proxy for JBD BMS)
 **Status:** Active | **Target:** Multi-BMS BLE concurrency, CI validation
@@ -152,7 +143,6 @@ Audit log of all D-Bus commands and inverter state transitions with chronology, 
 - [ ] Dependabot auto-merge for minor/patch updates
 - [ ] Repository archetypes (template repos for new services)
 - [ ] Org-level security policies (required reviews, signed commits)
-- **Branches pushed:** `feat/enable-org-discussions`, `feat/add-gitar-bot-bypass-rulesets`, `feat/inverter-dashboard-vue-repo`, `Enable-auto-merge-&-delete-branches;-tweak-repos` (ready for PRs)
 
 ### 14. .github-org (Organization Governance & Community)
 **Status:** Active | **Target:** Shared standards, reusable workflows
@@ -238,41 +228,6 @@ Audit log of all D-Bus commands and inverter state transitions with chronology, 
 
 ---
 
-## Branch & PR Status Summary
-
-| Repo | Branch | Status | PR |
-|------|--------|--------|----|
-| venus-os-observability | chore/gitignore-and-ci-split | Pushed | **Create PR** |
-| venus-os-observability | Update-dbus_listener.py | Pushed | **Create PR** |
-| inverter-monitoring | feat/grafana-dashboards-telegraf-optimization | Merged | ✅ PR #23 |
-| inverter-dashboard | feat/async-mqtt-migration | Merged | ✅ PR #71 |
-| inverter-dashboard | docs/mermaid-diagrams | Merged | ✅ PR #69 |
-| inverter-dashboard-go | review/code-quality | Rebased | **Create PR** |
-| inverter-dashboard-vue | main | Merged (releases) | — |
-| inverter-desktop | feat/startup-system-notifications | Rebased | **Create PR** |
-| inverter-desktop | feature/mqtt-ha-config | Rebased | **Create PR** |
-| inverter-desktop | feature/readme-updates | Rebased | **Create PR** |
-| inverter-desktop | fix/ha-entities-and-auth-v2 | Rebased | **Create PR** |
-| inverter-desktop | fix/ios-github-actions | Rebased | **Create PR** |
-| inverter-desktop | fix/readme-english-only | Rebased | **Create PR** |
-| inverter-desktop | fix/sonarqube-issues-2024-07-24 | Rebased | **Create PR** |
-| inverter-control | feat/mqtt-nan-inf-handling | Merged | ✅ PR #67 |
-| dbus-mqtt-battery | fix/code-quality-with-cellcount | Merged | ✅ PR #19 |
-| dbus-tasmota-pv | review/code-quality | Rebased | **Create PR** |
-| dbus-tasmota-pv | main | Merged | — |
-| esphome-jbd-bms-mqtt | main | Merged | — |
-| integration-tests | main | Merged | — |
-| terraform-github-victron | feat/enable-org-discussions | Pushed | **Create PR** |
-| terraform-github-victron | feat/add-gitar-bot-bypass-rulesets | Pushed | **Create PR** |
-| terraform-github-victron | feat/inverter-dashboard-vue-repo | Pushed | **Create PR** |
-| terraform-github-victron | Enable-auto-merge-&-delete-branches;-tweak-repos | Pushed | **Create PR** |
-| .github-org | main | Merged | — |
-| 4alvit | feature/readme-updates | Remote | Ready to merge |
-
----
-
-## Next Actions
-1. **Create PRs** - Click the PR URLs above (all branches pushed, 13 PRs pending)
-2. Begin Phase 2 for venus-os-observability: Grafana Tempo traces dashboard
-3. Start dbus-event-log implementation
-4. Terraform: apply in cloud to add venus-os-observability to branch protection rulesets
+1. Begin Phase 2 for venus-os-observability: Grafana Tempo traces dashboard
+2. Start dbus-event-log implementation
+3. Terraform: apply in cloud to add venus-os-observability to branch protection rulesets
