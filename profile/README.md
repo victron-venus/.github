@@ -37,7 +37,6 @@ flowchart TB
     end
 
     subgraph UI["Monitoring & dashboards"]
-        direction LR
         IC -->|"MQTT inverter/state"| MQTT
         MQTT --> DGO["inverter-dashboard-go\n(primary Cerbo binary)"]
         MQTT --> DPY["inverter-dashboard\n(Docker / alvit/inverter-dashboard)"]
@@ -48,13 +47,11 @@ flowchart TB
     end
 
     subgraph Data["Data & analytics"]
-        direction LR
         RAG["energy-data-rag-pipeline"] -->|"RAG pipeline"| DOCS["Victron docs + community"]
         SF["solar-forecast-langgraph"] -->|"Forecast + LangGraph"| MQTT
     end
 
     subgraph Dev["Development & ops"]
-        direction LR
         IT["integration-tests"]
         TFV["terraform-github-victron"]
         TF4["terraform-github-4alvit (personal)"]
