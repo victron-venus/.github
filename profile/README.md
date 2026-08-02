@@ -9,6 +9,7 @@ Created by [@4alvit](https://github.com/4alvit).
 ```mermaid
 flowchart TB
     subgraph Hardware["Hardware layer"]
+        direction LR
         BMS["JBD BMS / LiFePO4"]
         ESP["ESP32 + ESPHome"]
         TAS["Tasmota energy meter"]
@@ -16,6 +17,7 @@ flowchart TB
     end
 
     subgraph Control["Control layer (Venus OS packages)"]
+        direction LR
         ESP -->|"BLE → MQTT"| BM["dbus-mqtt-battery"]
         TAS -->|"HTTP"| PV["dbus-tasmota-pv"]
         BM -->|"D-Bus"| CERBO
@@ -27,6 +29,7 @@ flowchart TB
     end
 
     subgraph Bridge["Bridge services"]
+        direction LR
         ESP -.->|"BLE → MQTT"| ESPH["esphome-jbd-bms-mqtt"]
         ESPH -.-> BM
         FG["fastapi-mqtt-gateway"] -.->|"REST/WS → MQTT"| MQTT["MQTT broker"]
