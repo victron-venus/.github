@@ -7,7 +7,7 @@ Created by [@4alvit](https://github.com/4alvit).
 ## System architecture
 
 ```mermaid
-flowchart LR
+flowchart TB
     subgraph Hardware["Hardware layer"]
         BMS["JBD BMS / LiFePO4"]
         ESP["ESP32 + ESPHome"]
