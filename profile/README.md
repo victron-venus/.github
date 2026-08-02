@@ -16,6 +16,7 @@ flowchart LR
     end
 
     subgraph Hardware["Hardware layer"]
+        direction TB
         BMS["JBD BMS / LiFePO4"]
         ESP["ESP32 + ESPHome"]
         TAS["Tasmota energy meter"]
