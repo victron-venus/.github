@@ -8,13 +8,6 @@ Created by [@4alvit](https://github.com/4alvit).
 
 ```mermaid
 flowchart LR
-    subgraph Dev["Development & ops"]
-        IT["integration-tests"]
-        TFV["terraform-github-victron"]
-        TF4["terraform-github-4alvit (personal)"]
-        BUILD["iot-project-builder-profile"]
-    end
-
     subgraph Hardware["Hardware layer"]
         BMS["JBD BMS / LiFePO4"]
         ESP["ESP32 + ESPHome"]
@@ -53,6 +46,13 @@ flowchart LR
     subgraph Data["Data & analytics"]
         RAG["energy-data-rag-pipeline"] -->|"RAG pipeline"| DOCS["Victron docs + community"]
         SF["solar-forecast-langgraph"] -->|"Forecast + LangGraph"| MQTT
+    end
+
+    subgraph Dev["Development & ops"]
+        IT["integration-tests"]
+        TFV["terraform-github-victron"]
+        TF4["terraform-github-4alvit (personal)"]
+        BUILD["iot-project-builder-profile"]
     end
 
     style IC fill:#4ecdc4,color:#000
