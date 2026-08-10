@@ -1,0 +1,104 @@
+name: Feature Request
+description: Suggest a new feature or enhancement
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature! Please describe the problem and your proposed solution.
+  - type: dropdown
+    id: repo
+    attributes:
+      label: Repository
+      description: Which victron-venus repository should this feature live in?
+      options:
+        - inverter-control
+        - inverter-dashboard
+        - inverter-dashboard-go
+        - inverter-dashboard-vue
+        - inverter-desktop
+        - inverter-monitoring
+        - dbus-mqtt-battery
+        - dbus-tasmota-pv
+        - dbus-event-log
+        - dbus-service-template
+        - esphome-jbd-bms-mqtt
+        - esphome-ble-sensor-patterns
+        - fastapi-mqtt-gateway
+        - mqtt-observability-opentelemetry
+        - solar-forecast-langgraph
+        - venus-os-observability
+        - venus-os-governance
+        - integration-tests
+        - energy-data-rag-pipeline
+        - terraform-github
+        - iot-project-builder-profile
+        - 4alvit
+        - .github (org profile)
+        - New repository needed
+        - Other / Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve? Why is it needed?
+      placeholder: Currently, users cannot... This causes...
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: How should this feature work? Describe the ideal behavior.
+      placeholder: Add a new option to... Implement a handler for...
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions
+      description: Other approaches you've considered (workarounds, existing tools)
+      placeholder: Workaround: manually edit config... Considered: external tool X...
+    validations:
+      required: false
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      description: How broad is this change?
+      options:
+        - Single repository
+        - Multiple repositories (cross-cutting)
+        - New repository
+        - Infrastructure / CI / Terraform
+        - Documentation only
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Mockups, diagrams, related issues, Venus OS references, etc.
+      placeholder: |
+        Related: #123
+        Venus OS API: ...
+        Mermaid diagram:
+        ```mermaid
+        graph TD; A-->B
+        ```
+    validations:
+      required: false
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched existing issues/PRs for duplicates
+          required: true
+        - label: This aligns with victron-venus project goals (Victron energy stack)
+          required: true
+        - label: I can implement this or help test it
+          required: false
