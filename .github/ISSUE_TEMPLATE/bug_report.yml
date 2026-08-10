@@ -1,0 +1,123 @@
+name: Bug Report
+description: Report a reproducible bug
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the sections below.
+  - type: dropdown
+    id: repo
+    attributes:
+      label: Repository
+      description: Which victron-venus repository is affected?
+      options:
+        - inverter-control
+        - inverter-dashboard
+        - inverter-dashboard-go
+        - inverter-dashboard-vue
+        - inverter-desktop
+        - inverter-monitoring
+        - dbus-mqtt-battery
+        - dbus-tasmota-pv
+        - dbus-event-log
+        - dbus-service-template
+        - esphome-jbd-bms-mqtt
+        - esphome-ble-sensor-patterns
+        - fastapi-mqtt-gateway
+        - mqtt-observability-opentelemetry
+        - solar-forecast-langgraph
+        - venus-os-observability
+        - venus-os-governance
+        - integration-tests
+        - energy-data-rag-pipeline
+        - terraform-github
+        - iot-project-builder-profile
+        - 4alvit
+        - .github (org profile)
+        - Other / Not sure
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version / Commit
+      description: Version tag, commit SHA, or branch where bug occurs
+      placeholder: "v1.2.3 or abc123def"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: Clear and concise description of the bug
+      placeholder: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Minimal steps to trigger the bug
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should have happened?
+      placeholder: The system should...
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened (error messages, logs, screenshots)
+      placeholder: |
+        ```
+        Error: something went wrong
+        ```
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Hardware, OS, firmware, Docker, Venus OS version, etc.
+      placeholder: |
+        - Hardware: Cerbo GX / Raspberry Pi / ...
+        - OS: Venus OS 3.60 / Ubuntu 24.04 / ...
+        - Docker: 27.x / podman / ...
+        - Firmware: ...
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs
+      description: Paste relevant log output (use code blocks)
+      placeholder: |
+        ```
+        [ERROR] Something failed
+        ```
+      render: text
+    validations:
+      required: false
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched existing issues for duplicates
+          required: true
+        - label: This bug is reproducible on latest `main`
+          required: true
+        - label: I have included minimal reproduction steps
+          required: true
