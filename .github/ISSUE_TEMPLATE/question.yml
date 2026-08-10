@@ -1,0 +1,89 @@
+name: Question / Support
+description: Ask a question or request help
+title: "[Question]: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for **usage questions**, **configuration help**, or **clarification**.
+        
+        For bugs → use **Bug Report**. For features → use **Feature Request**.
+  - type: dropdown
+    id: repo
+    attributes:
+      label: Related Repository
+      description: Which victron-venus project is this about?
+      options:
+        - inverter-control
+        - inverter-dashboard
+        - inverter-dashboard-go
+        - inverter-dashboard-vue
+        - inverter-desktop
+        - inverter-monitoring
+        - dbus-mqtt-battery
+        - dbus-tasmota-pv
+        - dbus-event-log
+        - dbus-service-template
+        - esphome-jbd-bms-mqtt
+        - esphome-ble-sensor-patterns
+        - fastapi-mqtt-gateway
+        - mqtt-observability-opentelemetry
+        - solar-forecast-langgraph
+        - venus-os-observability
+        - venus-os-governance
+        - integration-tests
+        - energy-data-rag-pipeline
+        - terraform-github
+        - iot-project-builder-profile
+        - 4alvit
+        - .github (org profile)
+        - General / Multiple
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - Configuration / Setup
+        - D-Bus / Modbus / MQTT integration
+        - Venus OS / Cerbo GX
+        - ESPHome / Firmware
+        - Dashboard / UI
+        - Monitoring / Grafana / InfluxDB
+        - CI / CD / Terraform
+        - Architecture / Design
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: Be specific. Include what you've tried and what you're trying to achieve.
+      placeholder: |
+        I'm trying to configure X to do Y...
+        I've tried Z but got error...
+        Expected: ...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment (if relevant)
+      placeholder: |
+        - Venue: Cerbo GX / RPi / Venus OS version
+        - Firmware: ...
+        - Versions: ...
+    validations:
+      required: false
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have read the project README and docs
+          required: true
+        - label: I have searched existing issues and discussions
+          required: true
