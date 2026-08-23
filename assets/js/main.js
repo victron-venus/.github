@@ -94,16 +94,18 @@
     const sel = wrap.querySelector("select");
     sel.addEventListener("change", () => {
       if (!sel.value) return;
-      // victron-venus.github.io -> victron-venus-github-io.translate.goog
-      const host = location.hostname.replaceAll(".", "-");
+      // translate.goog host encoding: existing "-" -> "--", "." -> "-"
+      // victron-venus.github.io -> victron--venus-github-io.translate.goog
+      let host = location.hostname;
+      if (!host.endsWith(".translate.goog")) {
+        host = host.replaceAll("-", "--").replaceAll(".", "-") + ".translate.goog";
+      }
       const params = new URLSearchParams({
         _x_tr_sl: "auto",
         _x_tr_tl: sel.value,
         _x_tr_hl: "en",
       });
-      location.href =
-        `https://${host}.translate.goog${location.pathname}` +
-        `?${params}`;
+      location.href = `https://${host}${location.pathname}?${params}`;
     });
     footCol.appendChild(wrap);
   }
