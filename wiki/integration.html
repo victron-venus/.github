@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Venus OS integration — Victron Venus Wiki</title>
+<meta name="description" content="Venus OS integration conventions used across victron-venus projects: D-Bus service naming, MQTT topic structure, PackageManager installs, and the dbus-service-template.">
+<link rel="canonical" href="https://victron-venus.github.io/wiki/integration.html">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0a1628">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/" aria-label="Victron Venus home">
+      <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0f2036"/><path d="M18.5 4 8 18h6l-1.5 10L23 14h-6l1.5-10z" fill="#FFB454"/></svg>
+      victron-venus
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="/projects.html">projects</a>
+      <a href="/wiki/architecture.html">architecture</a>
+      <a href="/wiki/" aria-current="page">wiki</a>
+      <a class="nav-gh" href="https://github.com/victron-venus">GitHub&nbsp;↗</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="container section">
+<div class="wiki-layout">
+
+<nav class="wiki-nav" aria-label="Wiki navigation">
+  <span class="wn-label">Wiki</span>
+  <a href="/wiki/">Overview</a>
+  <a href="/wiki/install.html">Install guide</a>
+  <a href="/wiki/architecture.html">Architecture</a>
+  <a href="/wiki/integration.html" aria-current="page">Venus OS integration</a>
+  <a href="/wiki/ci-standards.html">CI standards</a>
+  <a href="/wiki/contributing.html">Contributing</a>
+</nav>
+
+<article class="prose">
+<p class="eyebrow">03 · Integration</p>
+<h1 style="font-family:var(--font-display);font-size:clamp(1.7rem,2.5vw+0.5rem,2.4rem);margin-top:0.75rem">Writing for Venus OS</h1>
+<p style="margin-top:0.75rem">Conventions shared by every service in this ecosystem. Follow them and
+your service behaves like the built-in ones — visible in the remote console, controllable by the ESS,
+auditable by the policy engine.</p>
+
+<h2>D-Bus service naming</h2>
+<p>Venus OS discovers services by their bus name. The pattern:</p>
+<pre><code>com.victronenergy.&lt;type&gt;.&lt;suffix&gt;
+
+com.victronenergy.battery.jbd_mqtt        # dbus-mqtt-battery
+com.victronenergy.pvinverter.tasmota      # dbus-tasmota-pv
+com.victronenergy.grid.esphome_ct         # dbus-esphome-grid-sensor
+com.victronenergy.acload.emporia_vue_1    # dbus-emporia-vue, one per channel</code></pre>
+<p>Pick <code>&lt;type&gt;</code> from what Venus OS already understands — <code>battery</code>,
+<code>pvinverter</code>, <code>grid</code>, <code>acload</code>, <code>solarcharger</code>. A wrong
+type means the GX ignores your service no matter how correct the paths are.</p>
+
+<h2>Paths every service should publish</h2>
+<div class="table-scroll">
+<table>
+  <thead><tr><th>Path</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>/ProductId, /ProductName</td><td>Identity shown in the device list</td></tr>
+    <tr><td>/Connected</td><td>Liveness — Venus hides services reporting 0</td></tr>
+    <tr><td>/Status or /ErrorCode</td><td>Fault visibility without opening logs</td></tr>
+    <tr><td>Type-specific values</td><td>e.g. /Dc/0/Voltage, /Ac/Power, /Soc</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>MQTT topic conventions</h2>
+<p>Telemetry mirrors use a stable prefix so subscribers can wildcard safely:</p>
+<pre><code>victron/&lt;source&gt;/&lt;device&gt;/&lt;metric&gt;
+
+victron/battery/jbd_1/Soc          # percent
+victron/grid/meter_1/Power         # watts, signed
+victron/inverter/state             # control-layer state changes
+victron/event/dbus                 # dbus-event-log audit stream</code></pre>
+<ul>
+  <li><strong>Retained state topics.</strong> Current-value topics publish retained so dashboards render instantly after reconnect.</li>
+  <li><strong>Events are not retained.</strong> Audit and event streams replay from storage (SQLite/TimescaleDB), not from the broker.</li>
+  <li><strong>No secrets in topics.</strong> ACLs belong in broker config; see fastapi-mqtt-gateway for the authenticated gateway pattern.</li>
+</ul>
+
+<h2>Installing as a package</h2>
+<p>All on-device services ship as Venus OS packages installable via PackageManager or
+<code>bootstrap.sh</code>. The layout follows the
+<a href="https://github.com/4alvit/dbus-service-template">dbus-service-template</a>:</p>
+<pre><code>service-name/
+├── service/run              # supervise script
+├── dbus-service.py          # entry point
+├── config.ini               # instance settings
+├── install.sh               # idempotent installer
+└── README.md</code></pre>
+<p>Scaffold a new service instead of hand-rolling the boilerplate:</p>
+<pre><code>copier copy https://github.com/4alvit/dbus-service-template my-dbus-service</code></pre>
+
+<h2>Rules that keep the fleet debuggable</h2>
+<ul>
+  <li><strong>Log to stdout/stderr</strong> — daemontools captures it under the service directory; never background yourself.</li>
+  <li><strong>Reconnect loops with backoff</strong> — MQTT and D-Bus drop during GX reboots; treat disconnects as normal.</li>
+  <li><strong>One service, one job.</strong> Translation, decision-making, and audit live in separate processes (see <a href="/wiki/architecture.html">architecture</a>).</li>
+  <li><strong>Register writes with governance.</strong> Any service issuing control commands must route them through venus-os-governance gates so dbus-event-log sees them.</li>
+</ul>
+
+<p style="margin-top:2rem"><a href="https://github.com/victron-venus/venus-os-integration-patterns">Working reference implementations →</a></p>
+</article>
+</div>
+</main>
+
+<footer>
+  <div class="container">
+    <p class="foot-note" style="margin-top:0;border:0;padding-top:0">Independent open-source projects. Not affiliated with Victron Energy B.V.
+    © <span data-year>2026</span> · <a href="https://github.com/victron-venus/.github">source of this site</a></p>
+  </div>
+</footer>
+
+<script src="/assets/js/main.js"></script>
+</body>
+</html>

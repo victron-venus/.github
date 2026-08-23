@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wiki — Victron Venus</title>
+<meta name="description" content="Documentation hub for the victron-venus ecosystem: install guide, architecture, Venus OS integration patterns, CI standards, and contributing workflow.">
+<link rel="canonical" href="https://victron-venus.github.io/wiki/">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0a1628">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/" aria-label="Victron Venus home">
+      <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0f2036"/><path d="M18.5 4 8 18h6l-1.5 10L23 14h-6l1.5-10z" fill="#FFB454"/></svg>
+      victron-venus
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="/projects.html">projects</a>
+      <a href="/wiki/architecture.html">architecture</a>
+      <a href="/wiki/" aria-current="page">wiki</a>
+      <a class="nav-gh" href="https://github.com/victron-venus">GitHub&nbsp;↗</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="container section">
+<div class="sec-head">
+  <p class="eyebrow">Wiki</p>
+  <h1 style="font-family:var(--font-display);font-size:clamp(1.9rem,3vw+0.5rem,2.8rem);margin-top:0.75rem">Documentation</h1>
+  <p>Everything needed to go from a stock Cerbo GX to the full open stack — and the standards
+  that keep the codebase maintainable.</p>
+</div>
+
+<div class="prose">
+  <h2>Where to start</h2>
+  <ol class="step-list">
+    <li><strong>Skim the <a href="/wiki/architecture.html">architecture</a></strong> — five layers, two buses (D-Bus on-device, MQTT everywhere else). Two minutes well spent before installing anything.</li>
+    <li><strong>Follow the <a href="/wiki/install.html">install guide</a></strong> for your hardware layer. Each step is independent; adopt only what you need.</li>
+    <li><strong>Dive into <a href="/wiki/integration.html">Venus OS integration</a></strong> when writing your own service — service naming, MQTT topics, PackageManager installs.</li>
+    <li><strong>Before your first PR, read <a href="/wiki/contributing.html">contributing</a></strong> and the <a href="/wiki/ci-standards.html">CI standards</a> every repo here follows.</li>
+  </ol>
+
+  <h2>All pages</h2>
+  <div class="wiki-cards">
+    <a class="wcard" href="/wiki/install.html"><span class="wn-num">01</span><h3>Install guide</h3><p>Layer-by-layer setup from flashing an ESP32 to a running dashboard.</p></a>
+    <a class="wcard" href="/wiki/architecture.html"><span class="wn-num">02</span><h3>Architecture</h3><p>The five layers and why control data stays on D-Bus while telemetry rides MQTT.</p></a>
+    <a class="wcard" href="/wiki/integration.html"><span class="wn-num">03</span><h3>Venus OS integration</h3><p>com.victronenergy.* naming, MQTT topic conventions, PackageManager.</p></a>
+    <a class="wcard" href="/wiki/ci-standards.html"><span class="wn-num">04</span><h3>CI standards</h3><p>Reusable workflows, SHA pinning, release rules, version sync.</p></a>
+    <a class="wcard" href="/wiki/contributing.html"><span class="wn-num">05</span><h3>Contributing</h3><p>Fork → branch → PR flow, conventional commits, local checks.</p></a>
+  </div>
+
+  <div class="callout">
+    <strong>Safety first.</strong> These projects control real inverters and batteries. Read the
+    <a href="/wiki/contributing.html#gates">approval gates</a> in venus-os-governance before enabling
+    automated control, and never test charge/discharge policies without a way to cut them off.
+  </div>
+</div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="foot-inner">
+      <div class="foot-col" style="max-width:340px">
+        <a class="brand" href="/">
+          <svg width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0f2036"/><path d="M18.5 4 8 18h6l-1.5 10L23 14h-6l1.5-10z" fill="#FFB454"/></svg>
+          victron-venus
+        </a>
+        <p>Open-source tooling for Victron Energy systems on Venus OS.<br>Created and maintained by <a href="https://github.com/4alvit">@4alvit</a>.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Projects</h4>
+        <a href="/projects.html">Full catalog</a>
+        <a href="https://github.com/victron-venus/inverter-control">inverter-control</a>
+        <a href="https://github.com/victron-venus/dbus-mqtt-battery">dbus-mqtt-battery</a>
+      </div>
+      <div class="foot-col">
+        <h4>Docs</h4>
+        <a href="/wiki/install.html">Install guide</a>
+        <a href="/wiki/architecture.html">Architecture</a>
+        <a href="/wiki/ci-standards.html">CI standards</a>
+        <a href="/wiki/contributing.html">Contributing</a>
+      </div>
+      <div class="foot-col">
+        <h4>Community</h4>
+        <a href="https://github.com/victron-venus">GitHub org ↗</a>
+        <a href="https://github.com/4alvit">@4alvit ↗</a>
+        <a href="https://community.victronenergy.com">Victron community ↗</a>
+      </div>
+    </div>
+    <p class="foot-note">Independent open-source projects. Not affiliated with, endorsed by, or sponsored by
+    Victron Energy B.V. “Victron”, “Venus OS” and “Cerbo” are trademarks of Victron Energy B.V.,
+    referenced here to describe hardware compatibility. © <span data-year>2026</span>.</p>
+  </div>
+</footer>
+
+<script src="/assets/js/main.js"></script>
+</body>
+</html>

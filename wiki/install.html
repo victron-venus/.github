@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install guide — Victron Venus Wiki</title>
+<meta name="description" content="Layer-by-layer install guide for the victron-venus stack: battery sensing, D-Bus services, ESS control, dashboards, and long-term monitoring.">
+<link rel="canonical" href="https://victron-venus.github.io/wiki/install.html">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0a1628">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/" aria-label="Victron Venus home">
+      <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0f2036"/><path d="M18.5 4 8 18h6l-1.5 10L23 14h-6l1.5-10z" fill="#FFB454"/></svg>
+      victron-venus
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="/projects.html">projects</a>
+      <a href="/wiki/architecture.html">architecture</a>
+      <a href="/wiki/" aria-current="page">wiki</a>
+      <a class="nav-gh" href="https://github.com/victron-venus">GitHub&nbsp;↗</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="container section">
+<div class="wiki-layout">
+
+<nav class="wiki-nav" aria-label="Wiki navigation">
+  <span class="wn-label">Wiki</span>
+  <a href="/wiki/">Overview</a>
+  <a href="/wiki/install.html" aria-current="page">Install guide</a>
+  <a href="/wiki/architecture.html">Architecture</a>
+  <a href="/wiki/integration.html">Venus OS integration</a>
+  <a href="/wiki/ci-standards.html">CI standards</a>
+  <a href="/wiki/contributing.html">Contributing</a>
+</nav>
+
+<article class="prose">
+<p class="eyebrow">01 · Install</p>
+<h1 style="font-family:var(--font-display);font-size:clamp(1.7rem,2.5vw+0.5rem,2.4rem);margin-top:0.75rem">Full stack install guide</h1>
+<p style="margin-top:0.75rem">Each layer installs independently. Start with what solves a real problem
+today — most people begin with battery sensing or the dashboard, not everything at once.</p>
+
+<h2>Prerequisites</h2>
+<ul>
+  <li>A Cerbo GX or other Venus OS device with network access and SSH enabled.</li>
+  <li>An MQTT broker reachable from both the GX and wherever dashboards run (Mosquitto works).</li>
+  <li>For battery sensing: an ESP32 and a JBD BMS battery within Bluetooth range.</li>
+</ul>
+
+<h2>Components by layer</h2>
+<div class="table-scroll">
+<table>
+  <thead><tr><th>Layer</th><th>Component</th><th>Install method</th></tr></thead>
+  <tbody>
+    <tr><td>Battery sensing</td><td>ESP32 + ESPHome</td><td>Flash firmware to the ESP32 (separate from the Cerbo)</td></tr>
+    <tr><td>Battery on D-Bus</td><td>dbus-mqtt-battery</td><td>Venus PackageManager or <code>bootstrap.sh</code></td></tr>
+    <tr><td>PV metering</td><td>Tasmota plug + dbus-tasmota-pv</td><td>Flash Tasmota, then install the Venus package</td></tr>
+    <tr><td>Grid metering</td><td>dbus-esphome-grid-sensor</td><td>Flash ESP32, install the Venus package</td></tr>
+    <tr><td>ESS control</td><td>inverter-control</td><td>Venus PackageManager or <code>bootstrap.sh</code></td></tr>
+    <tr><td>Live dashboard</td><td>inverter-dashboard-go</td><td>Cerbo binary or Venus package</td></tr>
+    <tr><td>Docker UI (optional)</td><td>inverter-dashboard</td><td>Docker on NAS: <code>alvit/inverter-dashboard</code></td></tr>
+    <tr><td>Desktop client (optional)</td><td>inverter-desktop</td><td>Release installer per platform</td></tr>
+    <tr><td>Long-term metrics</td><td>inverter-monitoring</td><td>Docker on NAS (Telegraf + InfluxDB + Grafana)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Recommended order</h2>
+<ol class="step-list">
+  <li><strong>Broker up first.</strong> Install Mosquitto somewhere always-on. Every component assumes it can reach the broker.</li>
+  <li><strong>Sense.</strong> Flash the ESP32 BLE proxy (<a href="https://github.com/victron-venus/esphome-jbd-bms-mqtt">esphome-jbd-bms-mqtt</a>) and verify BMS data lands in MQTT.</li>
+  <li><strong>Publish to D-Bus.</strong> Install <a href="https://github.com/victron-venus/dbus-mqtt-battery">dbus-mqtt-battery</a> on the GX. The battery appears in the Venus UI immediately.</li>
+  <li><strong>Add PV/grid metering</strong> if you have Tasmota plugs or a CT sensor — same pattern.</li>
+  <li><strong>Dashboard.</strong> Drop <a href="https://github.com/victron-venus/inverter-dashboard-go">inverter-dashboard-go</a> onto the Cerbo; open its port from any browser.</li>
+  <li><strong>Control last.</strong> Only after metering is trustworthy, install <a href="https://github.com/victron-venus/inverter-control">inverter-control</a>. Test grid-zero behavior with conservative limits first.</li>
+  <li><strong>Then the extras:</strong> long-term metrics, desktop client, forecasting, observability.</li>
+</ol>
+
+<h2>Verifying each step</h2>
+<p>After every layer, check before moving on:</p>
+<pre><code># On the Cerbo — does the service run?
+svc -s /service/dbus-mqtt-battery
+
+# On anything — did data reach MQTT?
+mosquitto_sub -t 'victron/#' -v</code></pre>
+<p>If <code>victron/#</code> shows values but the Venus remote console doesn't show the device,
+check the D-Bus service name against the <a href="/wiki/integration.html">integration reference</a>.</p>
+
+<div class="callout">
+  <strong>Uninstalling is safe.</strong> Every D-Bus service removes cleanly via PackageManager or by
+  deleting its <code>/opt/victronenergy/service-name</code> directory and restarting — no persistent
+  state outside its own log directory.
+</div>
+
+</article>
+</div>
+</main>
+
+<footer>
+  <div class="container">
+    <p class="foot-note" style="margin-top:0;border:0;padding-top:0">Independent open-source projects. Not affiliated with Victron Energy B.V.
+    © <span data-year>2026</span> · <a href="https://github.com/victron-venus/.github">source of this site</a></p>
+  </div>
+</footer>
+
+<script src="/assets/js/main.js"></script>
+</body>
+</html>
