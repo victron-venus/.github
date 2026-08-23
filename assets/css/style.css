@@ -378,6 +378,21 @@ a.tag:hover { color: var(--cyan); border-color: var(--cyan-dim); text-decoration
 .search-box:focus { outline: none; border-color: var(--cyan-dim); }
 .search-box::placeholder { color: var(--ink-faint); }
 
+/* Translate picker (footer) */
+.lang-select {
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  border-radius: 99px;
+  color: var(--ink-dim);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  padding: 0.4rem 0.9rem;
+  max-width: 200px;
+  cursor: pointer;
+}
+.lang-select:hover { border-color: var(--edge-hi); color: var(--ink); }
+.lang-select:focus-visible { outline-offset: 2px; }
+
 .empty-note { display: none; color: var(--ink-dim); font-family: var(--font-mono); font-size: 0.85rem; padding: 2rem 0; }
 .empty-note.show { display: block; }
 

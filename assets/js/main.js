@@ -63,4 +63,48 @@
   document.querySelectorAll("[data-year]").forEach((el) => {
     el.textContent = new Date().getFullYear();
   });
+
+  // ----- Auto-translate picker -----
+  // Builds a Google Translate (translate.goog) proxy URL for the current page.
+  // No third-party script loads until the visitor opts in.
+  const EURO_LANGS = {
+    sq: "shqip", hy: "հայերեն", az: "azərbaycan", be: "беларуская",
+    bs: "bosanski", bg: "български", ca: "català", hr: "hrvatski",
+    cs: "čeština", da: "dansk", nl: "Nederlands", en: "English",
+    et: "eesti", fi: "suomi", fr: "Français", gl: "galego",
+    ka: "ქართული", de: "Deutsch", el: "Ελληνικά", hu: "magyar",
+    is: "íslenska", ga: "Gaeilge", it: "Italiano", lv: "latviešu",
+    lt: "lietuvių", lb: "Lëtzebuergesch", mk: "македонски", mt: "Malti",
+    no: "norsk", pl: "polski", pt: "Português", ro: "română",
+    ru: "Русский", sr: "српски", sk: "slovenčina", sl: "slovenščina",
+    es: "Español", sv: "svenska", tr: "Türkçe", uk: "Українська", cy: "Cymraeg",
+  };
+  const footCol = document.querySelector(".foot-inner");
+  if (footCol && !location.host.startsWith("localhost")) {
+    const wrap = document.createElement("div");
+    wrap.className = "foot-col";
+    wrap.innerHTML =
+      '<h4>Translate</h4>' +
+      '<select class="lang-select" aria-label="Translate this page">' +
+      '<option value="">auto-translate…</option>' +
+      Object.entries(EURO_LANGS)
+        .map(([code, name]) => `<option value="${code}">${name}</option>`)
+        .join("") +
+      "</select>";
+    const sel = wrap.querySelector("select");
+    sel.addEventListener("change", () => {
+      if (!sel.value) return;
+      // victron-venus.github.io -> victron-venus-github-io.translate.goog
+      const host = location.hostname.replaceAll(".", "-");
+      const params = new URLSearchParams({
+        _x_tr_sl: "auto",
+        _x_tr_tl: sel.value,
+        _x_tr_hl: "en",
+      });
+      location.href =
+        `https://${host}.translate.goog${location.pathname}` +
+        `?${params}`;
+    });
+    footCol.appendChild(wrap);
+  }
 })();
