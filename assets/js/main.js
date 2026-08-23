@@ -79,6 +79,41 @@
     ru: "Русский", sr: "српски", sk: "slovenčina", sl: "slovenščina",
     es: "Español", sv: "svenska", tr: "Türkçe", uk: "Українська", cy: "Cymraeg",
   };
+  // translate.goog host encoding: existing "-" -> "--", "." -> "-"
+  // victron-venus.github.io -> victron--venus-github-io.translate.goog
+  function googUrl(targetLang) {
+    let host = location.hostname;
+    if (!host.endsWith(".translate.goog")) {
+      host = host.replaceAll("-", "--").replaceAll(".", "-") + ".translate.goog";
+    }
+    const params = new URLSearchParams({
+      _x_tr_sl: "auto",
+      _x_tr_tl: targetLang,
+      _x_tr_hl: "en",
+    });
+    return `https://${host}${location.pathname}?${params}`;
+  }
+
+  // Quick language links pinned to the top of every wiki page.
+  if (location.pathname.includes("/wiki") && !location.host.startsWith("localhost")) {
+    const QUICK_LANGS = [
+      ["nl", "Nederlands"],
+      ["de", "Deutsch"],
+      ["fr", "Français"],
+      ["ru", "Русский"],
+    ];
+    const bar = document.createElement("div");
+    bar.className = "lang-top container";
+    bar.setAttribute("aria-label", "Google Translate quick links");
+    bar.innerHTML =
+      '<span class="lt-label">🌐 Translate:</span>' +
+      QUICK_LANGS.map(
+        ([code, name]) => `<a href="${googUrl(code)}" hreflang="${code}">${name}</a>`
+      ).join("");
+    const header = document.querySelector("header.nav");
+    if (header) header.insertAdjacentElement("afterend", bar);
+  }
+
   const footCol = document.querySelector(".foot-inner");
   if (footCol && !location.host.startsWith("localhost")) {
     const wrap = document.createElement("div");
@@ -94,18 +129,7 @@
     const sel = wrap.querySelector("select");
     sel.addEventListener("change", () => {
       if (!sel.value) return;
-      // translate.goog host encoding: existing "-" -> "--", "." -> "-"
-      // victron-venus.github.io -> victron--venus-github-io.translate.goog
-      let host = location.hostname;
-      if (!host.endsWith(".translate.goog")) {
-        host = host.replaceAll("-", "--").replaceAll(".", "-") + ".translate.goog";
-      }
-      const params = new URLSearchParams({
-        _x_tr_sl: "auto",
-        _x_tr_tl: sel.value,
-        _x_tr_hl: "en",
-      });
-      location.href = `https://${host}${location.pathname}?${params}`;
+      location.href = googUrl(sel.value);
     });
     footCol.appendChild(wrap);
   }
