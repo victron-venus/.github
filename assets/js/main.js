@@ -95,6 +95,17 @@
 
   let elementLoaded = false;
 
+  // "Visitor chose Original" flag (localStorage can throw in privacy modes).
+  function origFlagSet(on) {
+    try {
+      if (on) localStorage.setItem("googtrans-original", "1");
+      else localStorage.removeItem("googtrans-original");
+    } catch (e) {}
+  }
+  function origFlagGet() {
+    try { return localStorage.getItem("googtrans-original"); } catch (e) { return null; }
+  }
+
   // Google renders its own <select class="goog-te-combo"> inside the hidden
   // mount; setting its value and firing change translates the page in place.
   function applyViaCombo(code) {
@@ -135,11 +146,14 @@
 
   function setLang(code) {
     if (!code) {
-      // Back to original: drop the cookie, reload clean.
+      // Back to original: drop the cookie, reload clean. Remember the
+      // choice so browser-language auto-detect stays off afterwards.
       document.cookie = "googtrans=;path=/;max-age=0";
+      origFlagSet(true);
       location.reload();
       return;
     }
+    origFlagSet(false);
     document.cookie = `googtrans=/en/${code};path=/;samesite=lax`;
     ensureTranslateElement();
     applyViaCombo(code);
@@ -191,6 +205,18 @@
     sel.addEventListener("change", () => setLang(sel.value));
     sel.value = activeLang();
     footCol.appendChild(wrap);
+  }
+
+  // Browser-language auto-detect: first visit in a non-English browser
+  // translates automatically. Skipped once the visitor picks Original
+  // (opt-out flag) or a language of their own.
+  if (
+    !location.host.startsWith("localhost") &&
+    !activeLang() &&
+    !origFlagGet()
+  ) {
+    const auto = (navigator.language || "").slice(0, 2).toLowerCase();
+    if (auto !== "en" && EURO_LANGS[auto]) setLang(auto);
   }
 
   markActive(activeLang());
