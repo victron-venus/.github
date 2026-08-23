@@ -8,25 +8,25 @@
 <link rel="canonical" href="https://victron-venus.github.io/wiki/integration.html">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#0a1628">
-<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 
 <header class="nav">
   <div class="container nav-inner">
-    <a class="brand" href="/" aria-label="Victron Venus home">
+    <a class="brand" href="../" aria-label="Victron Venus home">
       <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0f2036"/><path d="M18.5 4 8 18h6l-1.5 10L23 14h-6l1.5-10z" fill="#FFB454"/></svg>
       victron-venus
     </a>
     <nav class="nav-links" aria-label="Main navigation">
-      <a href="/projects.html">projects</a>
-      <a href="/wiki/architecture.html">architecture</a>
-      <a href="/wiki/" aria-current="page">wiki</a>
+      <a href="../projects.html">projects</a>
+      <a href="architecture.html">architecture</a>
+      <a href="./" aria-current="page">wiki</a>
       <a class="nav-gh" href="https://github.com/victron-venus">GitHub&nbsp;↗</a>
     </nav>
   </div>
@@ -37,12 +37,12 @@
 
 <nav class="wiki-nav" aria-label="Wiki navigation">
   <span class="wn-label">Wiki</span>
-  <a href="/wiki/">Overview</a>
-  <a href="/wiki/install.html">Install guide</a>
-  <a href="/wiki/architecture.html">Architecture</a>
-  <a href="/wiki/integration.html" aria-current="page">Venus OS integration</a>
-  <a href="/wiki/ci-standards.html">CI standards</a>
-  <a href="/wiki/contributing.html">Contributing</a>
+  <a href="./">Overview</a>
+  <a href="install.html">Install guide</a>
+  <a href="architecture.html">Architecture</a>
+  <a href="integration.html" aria-current="page">Venus OS integration</a>
+  <a href="ci-standards.html">CI standards</a>
+  <a href="contributing.html">Contributing</a>
 </nav>
 
 <article class="prose">
@@ -108,7 +108,7 @@ victron/event/dbus                 # dbus-event-log audit stream</code></pre>
 <ul>
   <li><strong>Log to stdout/stderr</strong> — daemontools captures it under the service directory; never background yourself.</li>
   <li><strong>Reconnect loops with backoff</strong> — MQTT and D-Bus drop during GX reboots; treat disconnects as normal.</li>
-  <li><strong>One service, one job.</strong> Translation, decision-making, and audit live in separate processes (see <a href="/wiki/architecture.html">architecture</a>).</li>
+  <li><strong>One service, one job.</strong> Translation, decision-making, and audit live in separate processes (see <a href="architecture.html">architecture</a>).</li>
   <li><strong>Register writes with governance.</strong> Any service issuing control commands must route them through venus-os-governance gates so dbus-event-log sees them.</li>
 </ul>
 
@@ -124,6 +124,6 @@ victron/event/dbus                 # dbus-event-log audit stream</code></pre>
   </div>
 </footer>
 
-<script src="/assets/js/main.js"></script>
+<script src="../assets/js/main.js"></script>
 </body>
 </html>

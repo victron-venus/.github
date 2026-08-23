@@ -6,7 +6,7 @@ organization. Two jobs:
 1. **Organization profile** — `profile/README.md` (shown on the org page), community health files,
    and issue templates.
 2. **Organization website** — served by GitHub Pages at
-   **[https://victron-venus.github.io](https://victron-venus.github.io/)** from the root of `main`.
+   **[https://victron-venus.github.io/.github/](https://victron-venus.github.io/.github/)** (the root https://victron-venus.github.io/ redirects there via the `victron-venus.github.io` repo) from the root of `main`.
 
 ## Website structure
 
