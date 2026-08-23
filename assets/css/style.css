@@ -36,6 +36,9 @@ body {
   font-size: 16px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  /* Google Translate pins the page down when it injects its toolbar;
+     we hide the toolbar, so keep the page in place. */
+  top: 0 !important;
 }
 
 img, svg { max-width: 100%; }
@@ -421,10 +424,10 @@ a.tag:hover { color: var(--cyan); border-color: var(--cyan-dim); text-decoration
 }
 
 /* Google Translate Element housekeeping: suppress the injected toolbar
-   banner and keep the hidden widget mount out of view. */
+   banner and keep the hidden widget mount out of view.
+   (body { top } override lives in the base body rule above.) */
 iframe.goog-te-banner-frame,
 .goog-te-banner-frame.skiptranslate { display: none !important; }
-body { top: 0 !important; }
 #google_translate_element {
   position: absolute;
   width: 0;

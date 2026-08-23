@@ -89,11 +89,11 @@
   ];
 
   function activeLang() {
-    const m = document.cookie.match(/(?:^|;\s*)googtrans=\/en\/([a-zA-Z-]+)/);
+    const m = /(?:^|;\s*)googtrans=\/en\/([a-zA-Z-]+)/.exec(document.cookie);
     return m ? m[1].toLowerCase() : "";
   }
 
-  let elementLoaded = false;
+  let translateWidget = null;
 
   // "Visitor chose Original" flag (localStorage can throw in privacy modes).
   function origFlagSet(on) {
@@ -111,7 +111,8 @@
   function applyViaCombo(code) {
     let tries = 0;
     (function poke() {
-      const combo = document.querySelector("select.goog-te-combo");
+      const combo =
+        translateWidget && document.querySelector("select.goog-te-combo");
       if (combo && code) {
         combo.value = code;
         combo.dispatchEvent(new Event("change"));
@@ -123,17 +124,16 @@
   }
 
   function ensureTranslateElement() {
-    if (elementLoaded) return;
+    if (translateWidget) return;
     window.googleTranslateElementInit = function () {
       // Hidden mount: translation is driven from our own picker UI.
       const mount = document.createElement("div");
       mount.id = "google_translate_element";
       document.body.appendChild(mount);
-      new google.translate.TranslateElement(
+      translateWidget = new google.translate.TranslateElement(
         { pageLanguage: "en", autoDisplay: false },
         "google_translate_element"
       );
-      elementLoaded = true;
       const saved = activeLang();
       if (saved) applyViaCombo(saved); // restore the choice on later pages
     };
