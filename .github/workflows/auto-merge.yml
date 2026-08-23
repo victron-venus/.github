@@ -41,6 +41,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_PAT }}
           MERGE_METHOD: squash
+          # pascalgn default is "automerge"; our org convention is this label
+          MERGE_LABELS: auto-merge
           MERGE_COMMIT_MESSAGE: automatic
           MERGE_RETRIES: 3
           MERGE_RETRY_SLEEP: 10000
