@@ -96,7 +96,8 @@ a:hover { text-decoration: underline; }
   color: var(--ink);
 }
 .brand:hover { text-decoration: none; color: var(--amber); }
-.brand svg { flex: none; }
+.brand svg, .brand-logo { flex: none; }
+.brand-logo { border-radius: 6px; }
 
 .nav-links {
   display: flex;
