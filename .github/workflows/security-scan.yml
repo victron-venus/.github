@@ -12,6 +12,10 @@ on:
 
 permissions:
   contents: read
+  # CodeQL in the reusable workflow uploads SARIF — the caller must allow
+  # it or the run dies as a startup_failure with no logs.
+  security-events: write
+  actions: read
 
 jobs:
   security-scan:
