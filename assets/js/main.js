@@ -64,8 +64,10 @@
     el.textContent = new Date().getFullYear();
   });
 
-  // ----- Auto-translate picker -----
-  // Builds a Google Translate (translate.goog) proxy URL for the current page.
+  // ----- In-place Google Translate -----
+  // Uses Google's Translate Element: the page is rewritten where it stands —
+  // no translate.goog proxy hop and no collapsible top banner. A googtrans
+  // cookie keeps the choice across every page of the site.
   // No third-party script loads until the visitor opts in.
   const EURO_LANGS = {
     sq: "shqip", hy: "հայերեն", az: "azərbaycan", be: "беларуская",
@@ -79,40 +81,96 @@
     ru: "Русский", sr: "српски", sk: "slovenčina", sl: "slovenščina",
     es: "Español", sv: "svenska", tr: "Türkçe", uk: "Українська", cy: "Cymraeg",
   };
-  // translate.goog host encoding: existing "-" -> "--", "." -> "-"
-  // victron-venus.github.io -> victron--venus-github-io.translate.goog
-  function googUrl(targetLang) {
-    let host = location.hostname;
-    if (!host.endsWith(".translate.goog")) {
-      host = host.replaceAll("-", "--").replaceAll(".", "-") + ".translate.goog";
-    }
-    const params = new URLSearchParams({
-      _x_tr_sl: "auto",
-      _x_tr_tl: targetLang,
-      _x_tr_hl: "en",
-      // skip the collapsible Translate banner injected by default;
-      // page renders clean immediately
-      _x_tr_pto: "wapp",
-    });
-    return `https://${host}${location.pathname}?${params}`;
+  const QUICK_LANGS = [
+    ["nl", "Nederlands"],
+    ["de", "Deutsch"],
+    ["fr", "Français"],
+    ["ru", "Русский"],
+  ];
+
+  function activeLang() {
+    const m = document.cookie.match(/(?:^|;\s*)googtrans=\/en\/([a-zA-Z-]+)/);
+    return m ? m[1].toLowerCase() : "";
   }
 
-  // Quick language links pinned to the top of every wiki page.
+  let elementLoaded = false;
+
+  // Google renders its own <select class="goog-te-combo"> inside the hidden
+  // mount; setting its value and firing change translates the page in place.
+  function applyViaCombo(code) {
+    let tries = 0;
+    (function poke() {
+      const combo = document.querySelector("select.goog-te-combo");
+      if (combo && code) {
+        combo.value = code;
+        combo.dispatchEvent(new Event("change"));
+        markActive(code);
+      } else if (++tries < 40) {
+        setTimeout(poke, 50);
+      }
+    })();
+  }
+
+  function ensureTranslateElement() {
+    if (elementLoaded) return;
+    window.googleTranslateElementInit = function () {
+      // Hidden mount: translation is driven from our own picker UI.
+      const mount = document.createElement("div");
+      mount.id = "google_translate_element";
+      document.body.appendChild(mount);
+      new google.translate.TranslateElement(
+        { pageLanguage: "en", autoDisplay: false },
+        "google_translate_element"
+      );
+      elementLoaded = true;
+      const saved = activeLang();
+      if (saved) applyViaCombo(saved); // restore the choice on later pages
+    };
+    const s = document.createElement("script");
+    s.async = true;
+    s.src =
+      "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+    document.head.appendChild(s);
+  }
+
+  function setLang(code) {
+    if (!code) {
+      // Back to original: drop the cookie, reload clean.
+      document.cookie = "googtrans=;path=/;max-age=0";
+      location.reload();
+      return;
+    }
+    document.cookie = `googtrans=/en/${code};path=/;samesite=lax`;
+    ensureTranslateElement();
+    applyViaCombo(code);
+  }
+
+  function markActive(code) {
+    document.querySelectorAll(".lang-top .lang-btn").forEach((b) => {
+      const on = b.dataset.lang === code;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-pressed", String(on));
+    });
+    const sel = document.querySelector(".foot-inner select.lang-select");
+    if (sel) sel.value = code;
+  }
+
+  // Quick language buttons pinned to the top of every wiki page.
   if (location.pathname.includes("/wiki") && !location.host.startsWith("localhost")) {
-    const QUICK_LANGS = [
-      ["nl", "Nederlands"],
-      ["de", "Deutsch"],
-      ["fr", "Français"],
-      ["ru", "Русский"],
-    ];
     const bar = document.createElement("div");
     bar.className = "lang-top container";
-    bar.setAttribute("aria-label", "Google Translate quick links");
+    bar.setAttribute("aria-label", "In-place Google Translate");
     bar.innerHTML =
       '<span class="lt-label">🌐 Translate:</span>' +
       QUICK_LANGS.map(
-        ([code, name]) => `<a href="${googUrl(code)}" hreflang="${code}">${name}</a>`
-      ).join("");
+        ([code, name]) =>
+          `<button type="button" class="lang-btn" data-lang="${code}">${name}</button>`
+      ).join("") +
+      '<button type="button" class="lang-btn" data-lang="">Original</button>';
+    bar.addEventListener("click", (e) => {
+      const btn = e.target.closest(".lang-btn");
+      if (btn) setLang(btn.dataset.lang);
+    });
     const header = document.querySelector("header.nav");
     if (header) header.insertAdjacentElement("afterend", bar);
   }
@@ -124,16 +182,16 @@
     wrap.innerHTML =
       '<h4>Translate</h4>' +
       '<select class="lang-select" aria-label="Translate this page">' +
-      '<option value="">auto-translate…</option>' +
+      '<option value="">English (original)</option>' +
       Object.entries(EURO_LANGS)
         .map(([code, name]) => `<option value="${code}">${name}</option>`)
         .join("") +
       "</select>";
     const sel = wrap.querySelector("select");
-    sel.addEventListener("change", () => {
-      if (!sel.value) return;
-      location.href = googUrl(sel.value);
-    });
+    sel.addEventListener("change", () => setLang(sel.value));
+    sel.value = activeLang();
     footCol.appendChild(wrap);
   }
+
+  markActive(activeLang());
 })();
