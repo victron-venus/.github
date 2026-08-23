@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Architecture — Victron Venus Wiki</title>
+<meta name="description" content="The five layers of the victron-venus ecosystem: sensing, D-Bus services, control and policy, MQTT distribution, and dashboards/observability — and why the split exists.">
+<link rel="canonical" href="https://victron-venus.github.io/wiki/architecture.html">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0a1628">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/" aria-label="Victron Venus home">
+      <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0f2036"/><path d="M18.5 4 8 18h6l-1.5 10L23 14h-6l1.5-10z" fill="#FFB454"/></svg>
+      victron-venus
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="/projects.html">projects</a>
+      <a href="/wiki/architecture.html" aria-current="page">architecture</a>
+      <a href="/wiki/">wiki</a>
+      <a class="nav-gh" href="https://github.com/victron-venus">GitHub&nbsp;↗</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="container section">
+<div class="wiki-layout">
+
+<nav class="wiki-nav" aria-label="Wiki navigation">
+  <span class="wn-label">Wiki</span>
+  <a href="/wiki/">Overview</a>
+  <a href="/wiki/install.html">Install guide</a>
+  <a href="/wiki/architecture.html" aria-current="page">Architecture</a>
+  <a href="/wiki/integration.html">Venus OS integration</a>
+  <a href="/wiki/ci-standards.html">CI standards</a>
+  <a href="/wiki/contributing.html">Contributing</a>
+</nav>
+
+<article class="prose">
+<p class="eyebrow">02 · Architecture</p>
+<h1 style="font-family:var(--font-display);font-size:clamp(1.7rem,2.5vw+0.5rem,2.4rem);margin-top:0.75rem">How the system fits together</h1>
+<p style="margin-top:0.75rem">One rule drives the whole design: <strong>Venus OS speaks D-Bus,
+everything else speaks MQTT.</strong> Every project here is either a translator at that boundary
+or a consumer on one side of it.</p>
+
+<h2>The five layers</h2>
+
+<div class="layers">
+  <div class="layer">
+    <h3>1 · Hardware &amp; sensing</h3>
+    <p>ESP32s, Tasmota plugs, CT clamps, Emporia Vue submeters. Firmware publishes raw readings.
+    <a href="https://github.com/victron-venus/esphome-jbd-bms-mqtt">esphome-jbd-bms-mqtt</a><a href="https://github.com/victron-venus/dbus-esphome-grid-sensor">dbus-esphome-grid-sensor</a></p>
+  </div>
+  <div class="layer">
+    <h3>2 · D-Bus services</h3>
+    <p>Translators running on the GX: MQTT→D-Bus for batteries, HTTP→D-Bus for PV meters, WebSocket→D-Bus for AC loads. Third-party hardware becomes native Victron devices.
+    <a href="https://github.com/victron-venus/dbus-mqtt-battery">dbus-mqtt-battery</a><a href="https://github.com/victron-venus/dbus-tasmota-pv">dbus-tasmota-pv</a><a href="https://github.com/victron-venus/dbus-emporia-vue">dbus-emporia-vue</a></p>
+  </div>
+  <div class="layer">
+    <h3>3 · Control &amp; policy</h3>
+    <p>The only layer allowed to <em>write</em> to the inverter. inverter-control decides setpoints; venus-os-governance gates every command against SOC limits and policies; dbus-event-log records both.
+    <a href="https://github.com/victron-venus/inverter-control">inverter-control</a><a href="https://github.com/victron-venus/venus-os-governance">venus-os-governance</a><a href="https://github.com/victron-venus/dbus-event-log">dbus-event-log</a></p>
+  </div>
+  <div class="layer">
+    <h3>4 · MQTT distribution</h3>
+    <p>State leaves the GX over MQTT topics. fastapi-mqtt-gateway adds REST/WebSocket access for clients that can't speak MQTT natively.
+    <a href="https://github.com/victron-venus/fastapi-mqtt-gateway">fastapi-mqtt-gateway</a></p>
+  </div>
+  <div class="layer">
+    <h3>5 · Consumption</h3>
+    <p>Dashboards (Go binary on-GX, Python/Docker, Vue SPA, Tauri desktop), Home Assistant, observability stacks, and the LangGraph forecaster feeding pre-charge hints back into control.
+    <a href="https://github.com/victron-venus/inverter-dashboard-go">inverter-dashboard-go</a><a href="https://github.com/4alvit/solar-forecast-langgraph">solar-forecast-langgraph</a><a href="https://github.com/victron-venus/venus-os-observability">venus-os-observability</a></p>
+  </div>
+</div>
+
+<h2>Why two buses instead of one</h2>
+<p>D-Bus is how Venus OS itself models the world — battery, PV inverter, grid meter all appear as
+<code>com.victronenergy.*</code> services, so the built-in ESS logic treats third-party hardware as
+first-class. That's non-negotiable for control.</p>
+<p>But D-Bus is local-only. Dashboards on a laptop, Home Assistant, Grafana, and forecasters live
+elsewhere — they subscribe to MQTT mirrors of the same state. The split keeps safety-critical paths
+on the bus the OS controls, and convenience paths on the protocol every tool already has a client for.</p>
+
+<h2>Control path vs telemetry path</h2>
+<div class="table-scroll">
+<table>
+  <thead><tr><th></th><th>Control path (amber)</th><th>Telemetry path (cyan)</th></tr></thead>
+  <tbody>
+    <tr><td>Protocol</td><td>D-Bus on-device</td><td>MQTT / REST / WebSocket</td></tr>
+    <tr><td>Writers</td><td>inverter-control via governance gates</td><td>every service publishes state</td></tr>
+    <tr><td>Audit</td><td>mandatory, via dbus-event-log</td><td>n/a</td></tr>
+    <tr><td>Latency budget</td><td>sub-second</td><td>seconds are fine</td></tr>
+    <tr><td>Failure mode</td><td>fail-safe to Victron defaults</td><td>dashboards go stale, nothing breaks</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Cross-cutting concerns</h2>
+<ul>
+  <li><strong>Forecasting loop:</strong> solar-forecast-langgraph reads MQTT history plus OpenMeteo, then asks inverter-control to pre-charge before cloudy periods — closing the loop through the same governed write path.</li>
+  <li><strong>AI access:</strong> mcp-venus-os exposes reads freely but routes writes through the same safety constraints as any other client.</li>
+  <li><strong>Testing:</strong> integration-tests runs the bridge services against a real broker and simulated D-Bus peers in CI, so a firmware change upstream can't silently break the chain.</li>
+</ul>
+
+<p style="margin-top:2rem"><a href="/wiki/integration.html">Next: writing your own service →</a></p>
+</article>
+</div>
+</main>
+
+<footer>
+  <div class="container">
+    <p class="foot-note" style="margin-top:0;border:0;padding-top:0">Independent open-source projects. Not affiliated with Victron Energy B.V.
+    © <span data-year>2026</span> · <a href="https://github.com/victron-venus/.github">source of this site</a></p>
+  </div>
+</footer>
+
+<script src="/assets/js/main.js"></script>
+</body>
+</html>

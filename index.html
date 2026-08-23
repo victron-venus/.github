@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Victron Venus — Open Control Systems for Victron Solar</title>
+<meta name="description" content="Open-source tools for Victron Energy systems on Venus OS: grid-zero inverter control, battery and PV D-Bus bridges, live dashboards, forecasting, and observability.">
+<link rel="canonical" href="https://victron-venus.github.io/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Victron Venus — Open Control Systems for Victron Solar">
+<meta property="og:description" content="Grid-zero control, battery/PV bridges, live dashboards, forecasting, and observability for Venus OS. 31 open-source projects.">
+<meta property="og:url" content="https://victron-venus.github.io/">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#0a1628">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Victron Venus",
+  "url": "https://victron-venus.github.io/",
+  "description": "Open-source tools for Victron Energy systems on Venus OS",
+  "publisher": {
+    "@type": "Organization",
+    "name": "victron-venus",
+    "url": "https://github.com/victron-venus"
+  }
+}
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/" aria-label="Victron Venus home">
+      <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0f2036"/><path d="M18.5 4 8 18h6l-1.5 10L23 14h-6l1.5-10z" fill="#FFB454"/></svg>
+      victron-venus
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="/projects.html">projects</a>
+      <a href="/wiki/architecture.html">architecture</a>
+      <a href="/wiki/">wiki</a>
+      <a class="nav-gh" href="https://github.com/victron-venus">GitHub&nbsp;↗</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero container">
+  <p class="eyebrow">Open source · Venus OS</p>
+  <h1>Your Victron installation, <em>wired for open control.</em></h1>
+  <p class="hero-sub">Grid-zero feed-in control, battery and PV bridges over D-Bus, live dashboards,
+  solar forecasting, and end-to-end observability &mdash; a complete open stack running on Cerbo GX
+  and Venus OS.</p>
+  <div class="cta-row">
+    <a class="btn btn-primary" href="#featured">Browse the stack</a>
+    <a class="btn btn-ghost" href="/wiki/install.html">Install guide</a>
+    <a class="btn btn-ghost" href="/wiki/architecture.html">How it fits together</a>
+  </div>
+
+  <!-- One-line diagram: amber = power/measurement, cyan = data -->
+  <div class="diagram-wrap">
+    <svg class="diagram" viewBox="0 0 1140 430" role="img"
+         aria-label="One-line diagram of the ecosystem: Tasmota PV meter, JBD BMS battery sensor, grid CT sensor, and Emporia submeters feed D-Bus services on the Cerbo GX. The GX publishes to an MQTT broker consumed by dashboards, Home Assistant, observability tooling, and the solar forecaster.">
+      <!-- edges -->
+      <path class="dg-edge power" data-n="pv"   d="M216,53 H300 V167 H372"/>
+      <path class="dg-edge power" data-n="bms"  d="M216,151 H320 V199 H372"/>
+      <path class="dg-edge power" data-n="grid" d="M216,249 H320 V231 H372"/>
+      <path class="dg-edge power" data-n="vue"  d="M216,347 H300 V263 H372"/>
+      <path class="dg-edge data"  data-n="hub mqtt" d="M680,177 H722 V79 H754"/>
+      <path class="dg-edge data"  data-n="mqtt dash" d="M890,79 H915 V51 H934"/>
+      <path class="dg-edge data"  data-n="mqtt ha"   d="M890,79 H915 V149 H934"/>
+      <path class="dg-edge data"  data-n="mqtt obs"  d="M890,79 H915 V247 H934"/>
+      <path class="dg-edge data"  data-n="mqtt fc"   d="M819,112 V296"/>
+      <!-- sources -->
+      <g class="dg-node" data-node="pv"><a href="https://github.com/victron-venus/dbus-tasmota-pv">
+        <rect x="16" y="24" width="200" height="58" rx="9"/>
+        <text x="30" y="49" font-size="13" font-weight="600">PV meter · Tasmota</text>
+        <text x="30" y="68" font-size="10.5" class="dg-sub">dbus-tasmota-pv</text>
+      </a></g>
+      <g class="dg-node" data-node="bms"><a href="https://github.com/victron-venus/esphome-jbd-bms-mqtt">
+        <rect x="16" y="122" width="200" height="58" rx="9"/>
+        <text x="30" y="147" font-size="13" font-weight="600">JBD BMS · ESPHome</text>
+        <text x="30" y="166" font-size="10.5" class="dg-sub">BLE proxy → dbus-mqtt-battery</text>
+      </a></g>
+      <g class="dg-node" data-node="grid"><a href="https://github.com/victron-venus/dbus-esphome-grid-sensor">
+        <rect x="16" y="220" width="200" height="58" rx="9"/>
+        <text x="30" y="245" font-size="13" font-weight="600">Grid CT sensor</text>
+        <text x="30" y="264" font-size="10.5" class="dg-sub">dbus-esphome-grid-sensor</text>
+      </a></g>
+      <g class="dg-node" data-node="vue"><a href="https://github.com/victron-venus/dbus-emporia-vue">
+        <rect x="16" y="318" width="200" height="58" rx="9"/>
+        <text x="30" y="343" font-size="13" font-weight="600">Emporia Vue meters</text>
+        <text x="30" y="362" font-size="10.5" class="dg-sub">dbus-emporia-vue · AC loads</text>
+      </a></g>
+      <!-- hub -->
+      <g class="dg-node hub" data-node="hub"><a href="/wiki/architecture.html">
+        <rect x="372" y="142" width="308" height="146" rx="11"/>
+        <text x="392" y="174" font-size="15" font-weight="700">CERBO GX · VENUS OS</text>
+        <text x="392" y="200" font-size="11" class="dg-sub">inverter-control — grid-zero ESS</text>
+        <text x="392" y="220" font-size="11" class="dg-sub">venus-os-governance — policy gates</text>
+        <text x="392" y="240" font-size="11" class="dg-sub">dbus-event-log — audit trail</text>
+        <text x="392" y="266" font-size="10" class="dg-sub">com.victronenergy.* services</text>
+      </a></g>
+      <!-- broker + consumers -->
+      <g class="dg-node" data-node="mqtt"><a href="https://github.com/victron-venus/fastapi-mqtt-gateway">
+        <rect x="754" y="52" width="136" height="60" rx="9"/>
+        <text x="768" y="78" font-size="13" font-weight="600">MQTT</text>
+        <text x="768" y="96" font-size="10" class="dg-sub">fastapi-mqtt-gateway</text>
+      </a></g>
+      <g class="dg-node" data-node="dash"><a href="https://github.com/victron-venus/inverter-dashboard-go">
+        <rect x="934" y="22" width="192" height="58" rx="9"/>
+        <text x="948" y="47" font-size="13" font-weight="600">Dashboards</text>
+        <text x="948" y="66" font-size="10" class="dg-sub">go · vue · desktop</text>
+      </a></g>
+      <g class="dg-node" data-node="ha"><a href="https://github.com/victron-venus/venus-os-integration-patterns">
+        <rect x="934" y="120" width="192" height="58" rx="9"/>
+        <text x="948" y="145" font-size="13" font-weight="600">Home Assistant</text>
+        <text x="948" y="164" font-size="10" class="dg-sub">integration-patterns</text>
+      </a></g>
+      <g class="dg-node" data-node="obs"><a href="https://github.com/victron-venus/venus-os-observability">
+        <rect x="934" y="218" width="192" height="58" rx="9"/>
+        <text x="948" y="243" font-size="13" font-weight="600">Observability</text>
+        <text x="948" y="262" font-size="10" class="dg-sub">OTel · Prometheus · Grafana</text>
+      </a></g>
+      <g class="dg-node" data-node="fc"><a href="https://github.com/4alvit/solar-forecast-langgraph">
+        <rect x="744" y="296" width="196" height="58" rx="9"/>
+        <text x="758" y="321" font-size="13" font-weight="600">Solar forecast</text>
+        <text x="758" y="340" font-size="10" class="dg-sub">solar-forecast-langgraph</text>
+      </a></g>
+    </svg>
+    <p class="legend">
+      <span class="p"><i></i>power &amp; measurement</span>
+      <span class="d"><i></i>data &amp; control</span>
+      <span>hover a block to trace its paths</span>
+    </p>
+  </div>
+
+  <div class="stats" aria-label="Ecosystem stats">
+    <span><b>20</b> repos in victron-venus</span>
+    <span><b>11</b> projects by <a href="https://github.com/4alvit">@4alvit</a></span>
+    <span><b>Python · Go · Vue · ESPHome</b></span>
+    <span><b>100%</b> open source</span>
+  </div>
+</section>
+
+<section class="section section-alt" id="featured">
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">Flagship</p>
+      <h2>Six projects that carry the system</h2>
+      <p>Each one runs in production on a real installation. The other twenty-five build around them.</p>
+    </div>
+    <div class="grid-cards">
+      <article class="proj">
+        <h3><a href="https://github.com/victron-venus/inverter-control">inverter-control<span class="ext">↗</span></a></h3>
+        <p>Grid-zero feed-in control for Victron inverters. Watches Home Assistant power data, drives the ESS over D-Bus, ships with its own web dashboard.</p>
+        <div class="proj-meta"><span class="lang lang-python">Python</span><span class="tag">ess</span><span class="tag">grid-zero</span><span class="org-chip">org</span></div>
+      </article>
+      <article class="proj">
+        <h3><a href="https://github.com/victron-venus/dbus-mqtt-battery">dbus-mqtt-battery<span class="ext">↗</span></a></h3>
+        <p>Bridges JBD BMS batteries published over MQTT onto Venus OS D-Bus, with full DVCC support. No-BMS chains get dbus-virtual-battery.</p>
+        <div class="proj-meta"><span class="lang lang-python">Python</span><span class="tag">battery</span><span class="tag">dvcc</span><span class="org-chip">org</span></div>
+      </article>
+      <article class="proj">
+        <h3><a href="https://github.com/victron-venus/inverter-dashboard-go">inverter-dashboard-go<span class="ext">↗</span></a></h3>
+        <p>Real-time web dashboard as a single Go binary that runs directly on the Cerbo. Same role as inverter-dashboard, zero Docker.</p>
+        <div class="proj-meta"><span class="lang lang-go">Go</span><span class="tag">real-time</span><span class="tag">websocket</span><span class="org-chip">org</span></div>
+      </article>
+      <article class="proj">
+        <h3><a href="https://github.com/4alvit/solar-forecast-langgraph">solar-forecast-langgraph<span class="ext">↗</span></a></h3>
+        <p>LangGraph workflow that forecasts generation from OpenMeteo weather plus historical inverter data, and pre-charges before cloudy periods.</p>
+        <div class="proj-meta"><span class="lang lang-python">Python</span><span class="tag">langgraph</span><span class="tag">openmeteo</span><span class="org-chip">4alvit</span></div>
+      </article>
+      <article class="proj">
+        <h3><a href="https://github.com/victron-venus/mcp-venus-os">mcp-venus-os<span class="ext">↗</span></a></h3>
+        <p>MCP server exposing Venus OS over D-Bus and MQTT to AI assistants &mdash; read anything, write only through safety-constrained control.</p>
+        <div class="proj-meta"><span class="lang lang-python">Python</span><span class="tag">mcp</span><span class="tag">ai</span><span class="org-chip">4alvit</span></div>
+      </article>
+      <article class="proj">
+        <h3><a href="https://github.com/victron-venus/venus-os-ci-toolkit">venus-os-ci-toolkit<span class="ext">↗</span></a></h3>
+        <p>Reusable GitHub Actions workflows behind every repo here: lint, test, coverage, govulncheck, Scorecard &mdash; pinned by commit SHA.</p>
+        <div class="proj-meta"><span class="tag">ci</span><span class="tag">actions</span><span class="org-chip">org</span></div>
+      </article>
+    </div>
+    <p style="margin-top:1.5rem"><a href="/projects.html">All 30 projects →</a></p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">Wiki</p>
+      <h2>From empty Cerbo to full stack</h2>
+      <p>The docs assume one Cerbo GX, some hardware to sense with, and an afternoon.</p>
+    </div>
+    <div class="wiki-cards">
+      <a class="wcard" href="/wiki/install.html"><span class="wn-num">01</span><h3>Install guide</h3><p>Layer-by-layer setup, from flashing an ESP32 to a running dashboard.</p></a>
+      <a class="wcard" href="/wiki/architecture.html"><span class="wn-num">02</span><h3>Architecture</h3><p>The five layers, what talks D-Bus vs MQTT, and why the split.</p></a>
+      <a class="wcard" href="/wiki/integration.html"><span class="wn-num">03</span><h3>Venus OS integration</h3><p>D-Bus service names, MQTT topic conventions, PackageManager installs.</p></a>
+      <a class="wcard" href="/wiki/ci-standards.html"><span class="wn-num">04</span><h3>CI standards</h3><p>Reusable workflows, SHA pinning, releases, version sync rules.</p></a>
+      <a class="wcard" href="/wiki/contributing.html"><span class="wn-num">05</span><h3>Contributing</h3><p>Fork → branch → PR flow, conventional commits, local checks.</p></a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <div class="foot-inner">
+      <div class="foot-col" style="max-width:340px">
+        <a class="brand" href="/">
+          <svg width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0f2036"/><path d="M18.5 4 8 18h6l-1.5 10L23 14h-6l1.5-10z" fill="#FFB454"/></svg>
+          victron-venus
+        </a>
+        <p>Open-source tooling for Victron Energy systems on Venus OS.<br>Created and maintained by <a href="https://github.com/4alvit">@4alvit</a>.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Projects</h4>
+        <a href="/projects.html">Full catalog</a>
+        <a href="https://github.com/victron-venus/inverter-control">inverter-control</a>
+        <a href="https://github.com/victron-venus/dbus-mqtt-battery">dbus-mqtt-battery</a>
+        <a href="https://github.com/victron-venus/venus-os-ci-toolkit">venus-os-ci-toolkit</a>
+      </div>
+      <div class="foot-col">
+        <h4>Docs</h4>
+        <a href="/wiki/install.html">Install guide</a>
+        <a href="/wiki/architecture.html">Architecture</a>
+        <a href="/wiki/ci-standards.html">CI standards</a>
+        <a href="/wiki/contributing.html">Contributing</a>
+      </div>
+      <div class="foot-col">
+        <h4>Community</h4>
+        <a href="https://github.com/victron-venus">GitHub org ↗</a>
+        <a href="https://github.com/4alvit">@4alvit ↗</a>
+        <a href="https://community.victronenergy.com">Victron community ↗</a>
+      </div>
+    </div>
+    <p class="foot-note">Independent open-source projects. Not affiliated with, endorsed by, or sponsored by
+    Victron Energy B.V. “Victron”, “Venus OS” and “Cerbo” are trademarks of Victron Energy B.V.,
+    referenced here to describe hardware compatibility. © <span data-year>2026</span>.</p>
+  </div>
+</footer>
+
+<script src="/assets/js/main.js"></script>
+</body>
+</html>

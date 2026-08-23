@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contributing — Victron Venus Wiki</title>
+<meta name="description" content="How to contribute to victron-venus projects: fork and branch flow, conventional commits, local checks, PR expectations, and review gates.">
+<link rel="canonical" href="https://victron-venus.github.io/wiki/contributing.html">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0a1628">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/" aria-label="Victron Venus home">
+      <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0f2036"/><path d="M18.5 4 8 18h6l-1.5 10L23 14h-6l1.5-10z" fill="#FFB454"/></svg>
+      victron-venus
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="/projects.html">projects</a>
+      <a href="/wiki/architecture.html">architecture</a>
+      <a href="/wiki/" aria-current="page">wiki</a>
+      <a class="nav-gh" href="https://github.com/victron-venus">GitHub&nbsp;↗</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="container section">
+<div class="wiki-layout">
+
+<nav class="wiki-nav" aria-label="Wiki navigation">
+  <span class="wn-label">Wiki</span>
+  <a href="/wiki/">Overview</a>
+  <a href="/wiki/install.html">Install guide</a>
+  <a href="/wiki/architecture.html">Architecture</a>
+  <a href="/wiki/integration.html">Venus OS integration</a>
+  <a href="/wiki/ci-standards.html">CI standards</a>
+  <a href="/wiki/contributing.html" aria-current="page">Contributing</a>
+</nav>
+
+<article class="prose">
+<p class="eyebrow">05 · Contributing</p>
+<h1 style="font-family:var(--font-display);font-size:clamp(1.7rem,2.5vw+0.5rem,2.4rem);margin-top:0.75rem">Making your first change</h1>
+<p style="margin-top:0.75rem">Same flow across all thirty repos. Small, focused PRs get merged fast;
+drive-by refactors wait behind them.</p>
+
+<h2>The flow</h2>
+<ol class="step-list">
+  <li><strong>Fork</strong> the target repository — or branch within the org if you're a maintainer.</li>
+  <li><strong>Create a feature branch</strong> from <code>main</code>. One concern per branch.</li>
+  <li><strong>Make the change</strong> with tests where applicable. Bug fixes come with a regression test.</li>
+  <li><strong>Commit with Conventional Commits:</strong> <code>feat:</code>, <code>fix:</code>,
+  <code>docs:</code>, <code>chore:</code>, <code>refactor:</code>, <code>test:</code>.</li>
+  <li><strong>Open a pull request.</strong> Describe what changes and why; link issues. CI and CodeQL must pass before merge.</li>
+  <li><strong>Address review feedback.</strong> Signed commits may be required on protected branches.</li>
+</ol>
+
+<h2>Local checks before pushing</h2>
+<p>Python projects run ruff, pylint, gitleaks, shellcheck, and whitespace fixers via pre-commit:</p>
+<pre><code># One-shot: everything configured in .pre-commit-config.yaml
+python3 -m pre_commit run --all-files
+
+# Or individually
+python3 -m ruff check --fix .
+python3 -m ruff format .
+python3 -m pylint inverter_control/
+shellcheck --exclude=SC2154,SC2164,SC2181,SC2029,SC1091 *.sh
+gitleaks detect --source .
+
+# Tests with coverage
+python3 -m pytest tests/ -v --cov=solar_forecast</code></pre>
+<p>Note: there is no bare <code>python</code> command on dev machines here — always
+<code>python3</code>. Pre-commit may auto-fix files during push; if it does, retry the push.</p>
+
+<h2 id="gates">Approval gates for control code</h2>
+<p>Changes touching the <em>write path</em> — anything that ends up commanding an inverter or battery —
+get extra scrutiny by design:</p>
+<ul>
+  <li>New setpoints or policy rules route through <strong>venus-os-governance</strong> approval gates, not direct D-Bus writes.</li>
+  <li>Every write lands in <strong>dbus-event-log</strong>; a PR that adds a command must add its audit trail too.</li>
+  <li>Default-off. Risky behavior ships disabled until configuration explicitly enables it.</li>
+</ul>
+
+<h2>Where to ask</h2>
+<ul>
+  <li>Bug or feature? Open an issue on the repo using the issue templates — they route to the right maintainers.</li>
+  <li>Questions about Venus OS integration patterns start in
+  <a href="https://github.com/victron-venus/venus-os-integration-patterns/issues">integration-patterns discussions</a>
+  or the <a href="https://community.victronenergy.com">Victron community forum</a>.</li>
+</ul>
+
+<p style="margin-top:2rem"><a href="/wiki/ci-standards.html">Related: CI standards →</a></p>
+</article>
+</div>
+</main>
+
+<footer>
+  <div class="container">
+    <p class="foot-note" style="margin-top:0;border:0;padding-top:0">Independent open-source projects. Not affiliated with Victron Energy B.V.
+    © <span data-year>2026</span> · <a href="https://github.com/victron-venus/.github">source of this site</a></p>
+  </div>
+</footer>
+
+<script src="/assets/js/main.js"></script>
+</body>
+</html>
