@@ -1,0 +1,24 @@
+name: 'Security Scan'
+# CodeQL is required by the org "Default" ruleset (code_scanning rule,
+# tool: CodeQL) — without it PRs block on "Waiting for Code Scanning
+# results". Thin wrapper around the toolkit reusable workflow; this repo
+# is a static site, so only the JavaScript analysis runs.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  security-scan:
+    name: Security Scan
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/security-scan.yml@23d5d855d21bd1f53764de232e80ce07ff1d0757
+    with:
+      languages: 'javascript'
+      run-codeql: true
+      run-trivy: false
+      run-dependency-review: false
