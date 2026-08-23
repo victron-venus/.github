@@ -90,6 +90,9 @@
       _x_tr_sl: "auto",
       _x_tr_tl: targetLang,
       _x_tr_hl: "en",
+      // skip the collapsible Translate banner injected by default;
+      // page renders clean immediately
+      _x_tr_pto: "wapp",
     });
     return `https://${host}${location.pathname}?${params}`;
   }
