@@ -131,7 +131,12 @@
       mount.id = "google_translate_element";
       document.body.appendChild(mount);
       translateWidget = new google.translate.TranslateElement(
-        { pageLanguage: "en", autoDisplay: false },
+        {
+          pageLanguage: "en",
+          // SIMPLE layout: inline dropdown, no top banner chrome.
+          layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+          autoDisplay: false,
+        },
         "google_translate_element"
       );
       const saved = activeLang();

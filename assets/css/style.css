@@ -36,9 +36,10 @@ body {
   font-size: 16px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
-  /* Google Translate pins the page down when it injects its toolbar;
-     we hide the toolbar, so keep the page in place. */
+  /* Google Translate pins the page down / repositions body when it
+     injects its toolbar; we hide the toolbar, so keep the page put. */
   top: 0 !important;
+  position: static !important;
 }
 
 img, svg { max-width: 100%; }
@@ -424,10 +425,19 @@ a.tag:hover { color: var(--cyan); border-color: var(--cyan-dim); text-decoration
 }
 
 /* Google Translate Element housekeeping: suppress the injected toolbar
-   banner and keep the hidden widget mount out of view.
-   (body { top } override lives in the base body rule above.) */
-iframe.goog-te-banner-frame,
-.goog-te-banner-frame.skiptranslate { display: none !important; }
+   banner, its hover balloons and the yellow highlight boxes it paints on
+   translated text; keep the hidden widget mount out of view. The widget's
+   own <select> stays reachable from JS even while display:none.
+   (body { top / position } override lives in the base body rule above.) */
+.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+.skiptranslate,
+goog-gt-tt,
+.goog-te-balloon-frame { display: none !important; }
+.goog-text-highlight {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
 #google_translate_element {
   position: absolute;
   width: 0;
