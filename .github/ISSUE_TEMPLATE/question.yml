@@ -31,7 +31,6 @@ body:
         - mqtt-observability-opentelemetry
         - solar-forecast-langgraph
         - venus-os-observability
-        - venus-os-governance
         - integration-tests
         - energy-data-rag-pipeline
         - terraform-github

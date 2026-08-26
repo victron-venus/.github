@@ -22,7 +22,7 @@ flowchart TB
         PV -->|"D-Bus"| CERBO
         IC["inverter-control"] -->|"D-Bus"| CERBO
         EL["dbus-event-log"] -->|"D-Bus monitor"| CERBO
-        GOV["venus-os-governance"] -->|"Policy engine"| CERBO
+        GOV["venus-os-governance (archived)"] -.->|"Policy engine"| CERBO
         OBS["venus-os-observability"] -->|"OTel tracing"| CERBO
     end
 
@@ -96,7 +96,7 @@ flowchart TB
 | [fastapi-mqtt-gateway](https://github.com/victron-venus/fastapi-mqtt-gateway) | REST/WebSocket → MQTT bridge (auth, rate limiting, streaming) |
 | [mqtt-observability-opentelemetry](https://github.com/victron-venus/mqtt-observability-opentelemetry) | OpenTelemetry observability for MQTT IoT systems |
 | [venus-os-observability](https://github.com/victron-venus/venus-os-observability) | OTel/Prometheus for Venus OS — D-Bus tracing, metrics export |
-| [venus-os-governance](https://github.com/victron-venus/venus-os-governance) | Policy engine with approval gates — SOC limits, charge/discharge rules |
+| [venus-os-governance](https://github.com/victron-venus/venus-os-governance) | 🗄️ Archived 2026-08 — superseded by inverter-control built-in safety |
 | [mcp-venus-os](https://github.com/victron-venus/mcp-venus-os) | MCP server for Venus OS D-Bus/MQTT management |
 
 ### Data & AI
