@@ -17,3 +17,4 @@ Thumbs.db
 *.log
 logs
 tmp_backup
+*.backup
