@@ -9,50 +9,56 @@ Created by [@4alvit](https://github.com/4alvit).
 ```mermaid
 flowchart TB
     subgraph Hardware["Hardware layer"]
+        direction TB
         BMS["JBD BMS / LiFePO4"]
-        ESP["ESP32 + ESPHome"]
-        TAS["Tasmota energy meter"]
-        CERBO["Cerbo GX / Venus OS"]
+        ~~~ ESP["ESP32 + ESPHome"]
+        ~~~ TAS["Tasmota energy meter"]
+        ~~~ CERBO["Cerbo GX / Venus OS"]
     end
 
     subgraph Control["Control layer (Venus OS packages)"]
+        direction TB
         ESP -->|"BLE → MQTT"| BM["dbus-mqtt-battery"]
-        TAS -->|"HTTP"| PV["dbus-tasmota-pv"]
-        BM -->|"D-Bus"| CERBO
-        PV -->|"D-Bus"| CERBO
-        IC["inverter-control"] -->|"D-Bus"| CERBO
-        EL["dbus-event-log"] -->|"D-Bus monitor"| CERBO
-        GOV["venus-os-governance (archived)"] -.->|"Policy engine"| CERBO
-        OBS["venus-os-observability"] -->|"OTel tracing"| CERBO
+        ~~~ TAS -->|"HTTP"| PV["dbus-tasmota-pv"]
+        ~~~ BM -->|"D-Bus"| CERBO
+        ~~~ PV -->|"D-Bus"| CERBO
+        ~~~ IC["inverter-control"] -->|"D-Bus"| CERBO
+        ~~~ EL["dbus-event-log"] -->|"D-Bus monitor"| CERBO
+        ~~~ GOV["venus-os-governance (archived)"] -.->|"Policy engine"| CERBO
+        ~~~ OBS["venus-os-observability"] -->|"OTel tracing"| CERBO
     end
 
     subgraph Bridge["Bridge services"]
+        direction TB
         ESP -.->|"BLE → MQTT"| ESPH["esphome-jbd-bms-mqtt"]
-        ESPH -.-> BM
-        FG["fastapi-mqtt-gateway"] -.->|"REST/WS → MQTT"| MQTT["MQTT broker"]
-        MO["mqtt-observability-opentelemetry"] -.->|"OTel → metrics/traces"| MQTT
+        ~~~ ESPH -.-> BM
+        ~~~ FG["fastapi-mqtt-gateway"] -.->|"REST/WS → MQTT"| MQTT["MQTT broker"]
+        ~~~ MO["mqtt-observability-opentelemetry"] -.->|"OTel → metrics/traces"| MQTT
     end
 
     subgraph UI["Monitoring & dashboards"]
+        direction TB
         IC -->|"MQTT inverter/state"| MQTT
-        MQTT --> DGO["inverter-dashboard-go\n(primary Cerbo binary)"]
-        MQTT --> DPY["inverter-dashboard\n(Docker / alvit/inverter-dashboard)"]
-        MQTT --> DVUE["inverter-dashboard-vue\n(shared Vue components)"]
-        MQTT --> DT["inverter-desktop\n(Tauri client)"]
-        MQTT --> MON["inverter-monitoring\n(TIG stack)"]
-        MQTT --> MCP["mcp-venus-os\n(MCP server)"]
+        ~~~ MQTT --> DGO["inverter-dashboard-go\n(primary Cerbo binary)"]
+        ~~~ MQTT --> DPY["inverter-dashboard\n(Docker / alvit/inverter-dashboard)"]
+        ~~~ MQTT --> DVUE["inverter-dashboard-vue\n(shared Vue components)"]
+        ~~~ MQTT --> DT["inverter-desktop\n(Tauri client)"]
+        ~~~ MQTT --> MON["inverter-monitoring\n(TIG stack)"]
+        ~~~ MQTT --> MCP["mcp-venus-os\n(MCP server)"]
     end
 
     subgraph Data["Data & analytics"]
+        direction TB
         RAG["energy-data-rag-pipeline"] -->|"RAG pipeline"| DOCS["Victron docs + community"]
-        SF["solar-forecast-langgraph"] -->|"Forecast + LangGraph"| MQTT
+        ~~~ SF["solar-forecast-langgraph"] -->|"Forecast + LangGraph"| MQTT
     end
 
     subgraph Dev["Development & ops"]
+        direction TB
         IT["integration-tests"]
-        TFV["terraform-github-victron"]
-        TF4["terraform-github-4alvit (personal)"]
-        BUILD["iot-project-builder-profile"]
+        ~~~ TFV["terraform-github-victron"]
+        ~~~ TF4["terraform-github-4alvit (personal)"]
+        ~~~ BUILD["iot-project-builder-profile"]
     end
 
     style IC fill:#4ecdc4,color:#000
