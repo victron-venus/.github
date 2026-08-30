@@ -8,58 +8,80 @@ Created by [@4alvit](https://github.com/4alvit).
 
 ```mermaid
 flowchart TB
-    subgraph Hardware["Hardware layer"]
+    subgraph HW["Hardware"]
         direction TB
-        BMS["JBD BMS / LiFePO4"]
+        CERBO["Cerbo GX / Venus OS"]
+        ~~~ BMS["JBD BMS / LiFePO4"]
         ~~~ ESP["ESP32 + ESPHome"]
         ~~~ TAS["Tasmota energy meter"]
-        ~~~ CERBO["Cerbo GX / Venus OS"]
     end
 
-    subgraph Control["Control layer (Venus OS packages)"]
+    subgraph CTL["Control (Venus OS packages)"]
         direction TB
-        ESP -->|"BLE → MQTT"| BM["dbus-mqtt-battery"]
-        ~~~ TAS -->|"HTTP"| PV["dbus-tasmota-pv"]
-        ~~~ BM -->|"D-Bus"| CERBO
-        ~~~ PV -->|"D-Bus"| CERBO
-        ~~~ IC["inverter-control"] -->|"D-Bus"| CERBO
-        ~~~ EL["dbus-event-log"] -->|"D-Bus monitor"| CERBO
-        ~~~ GOV["venus-os-governance (archived)"] -.->|"Policy engine"| CERBO
-        ~~~ OBS["venus-os-observability"] -->|"OTel tracing"| CERBO
+        BM["dbus-mqtt-battery"]
+        ~~~ PV["dbus-tasmota-pv"]
+        ~~~ IC["inverter-control"]
+        ~~~ EL["dbus-event-log"]
+        ~~~ OBS["venus-os-observability"]
+        ~~~ GOV["venus-os-governance (archived)"]
     end
 
-    subgraph Bridge["Bridge services"]
+    subgraph BRG["Bridge services"]
         direction TB
-        ESP -.->|"BLE → MQTT"| ESPH["esphome-jbd-bms-mqtt"]
-        ~~~ ESPH -.-> BM
-        ~~~ FG["fastapi-mqtt-gateway"] -.->|"REST/WS → MQTT"| MQTT["MQTT broker"]
-        ~~~ MO["mqtt-observability-opentelemetry"] -.->|"OTel → metrics/traces"| MQTT
+        ESPH["esphome-jbd-bms-mqtt"]
+        ~~~ FG["fastapi-mqtt-gateway"]
+        ~~~ MO["mqtt-observability-opentelemetry"]
+    end
+
+    subgraph DAT["Data & analytics"]
+        direction TB
+        RAG["energy-data-rag-pipeline"]
+        ~~~ SF["solar-forecast-langgraph"]
+    end
+
+    subgraph DEV["Development & ops"]
+        direction TB
+        IT["integration-tests"]
+        ~~~ TFV["terraform-github-victron"]
+        ~~~ TF4["terraform-github-4alvit"]
+        ~~~ BUILD["iot-project-builder-profile"]
     end
 
     subgraph UI["Monitoring & dashboards"]
         direction TB
-        IC -->|"MQTT inverter/state"| MQTT
-        ~~~ MQTT --> DGO["inverter-dashboard-go\n(primary Cerbo binary)"]
-        ~~~ MQTT --> DPY["inverter-dashboard\n(Docker / alvit/inverter-dashboard)"]
-        ~~~ MQTT --> DVUE["inverter-dashboard-vue\n(shared Vue components)"]
-        ~~~ MQTT --> DT["inverter-desktop\n(Tauri client)"]
-        ~~~ MQTT --> MON["inverter-monitoring\n(TIG stack)"]
-        ~~~ MQTT --> MCP["mcp-venus-os\n(MCP server)"]
+        MQTT["MQTT broker"]
+        ~~~ DGO["inverter-dashboard-go"]
+        ~~~ DPY["inverter-dashboard"]
+        ~~~ DVUE["inverter-dashboard-vue"]
+        ~~~ DT["inverter-desktop"]
+        ~~~ MON["inverter-monitoring"]
+        ~~~ MCP["mcp-venus-os"]
     end
 
-    subgraph Data["Data & analytics"]
-        direction TB
-        RAG["energy-data-rag-pipeline"] -->|"RAG pipeline"| DOCS["Victron docs + community"]
-        ~~~ SF["solar-forecast-langgraph"] -->|"Forecast + LangGraph"| MQTT
-    end
+    ESP -->|"BLE→MQTT"| BM
+    TAS -->|"HTTP"| PV
+    BM -->|"D-Bus"| CERBO
+    PV -->|"D-Bus"| CERBO
+    IC -->|"D-Bus"| CERBO
+    EL -->|"D-Bus monitor"| CERBO
+    OBS -->|"OTel tracing"| CERBO
+    GOV -.->|"Policy engine"| CERBO
 
-    subgraph Dev["Development & ops"]
-        direction TB
-        IT["integration-tests"]
-        ~~~ TFV["terraform-github-victron"]
-        ~~~ TF4["terraform-github-4alvit (personal)"]
-        ~~~ BUILD["iot-project-builder-profile"]
-    end
+    ESP -.->|"BLE→MQTT"| ESPH
+    ESPH -.-> BM
+    FG -.->|"REST/WS→MQTT"| MQTT
+    MO -.->|"OTel→metrics/traces"| MQTT
+
+    IC -->|"inverter/state"| MQTT
+    RAG -->|"RAG pipeline"| DOCS["Victron docs + community"]
+    SF -->|"Forecast"| MQTT
+
+    MQTT --> DGO
+    MQTT --> DPY
+    MQTT --> DVUE
+    MQTT --> DT
+    MQTT --> MON
+    MQTT --> MCP
 
     style IC fill:#4ecdc4,color:#000
     style DGO fill:#00ADD8,color:#fff
