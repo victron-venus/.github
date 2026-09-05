@@ -23,7 +23,7 @@ Created by [@4alvit](https://github.com/4alvit).
 - SSH access to Cerbo (`root@cerbo` or your hostname)
 - [kwindrem/SetupHelper](https://github.com/kwindrem/SetupHelper) on the Cerbo
 - MQTT enabled on Cerbo (or external broker reachable from all components)
-- Home Assistant (optional, for sensor entities used by inverter-control)
+- Home Assistant is optional; inverter-control derives EV data from D-Bus (not HA) on recent versions
 
 ## 1. Cerbo bootstrap (Venus packages)
 
@@ -77,7 +77,7 @@ esphome run jbd-bms-mqtt.yaml
 1. Edit `/data/inverter-control/config.yaml` (or use the repo template).
 2. Set Home Assistant URL/token and MQTT broker if not local.
 3. Restart: `svc -t /service/inverter-control`
-4. Confirm MQTT topic `inverter/state` publishes at ~3 Hz.
+4. Confirm MQTT topic `inverter/state` publishes at ~4 s cadence.
 
 ## 5. Dashboard
 
@@ -142,6 +142,28 @@ cd integration-tests
 docker compose up --abort-on-container-exit
 ```
 
+## 6b. EV charging (optional)
+
+`dbus-evcharger` and `dbus-ev` source EV data from the Cerbo's own MQTT broker —
+not Home Assistant — so the telemetry chain survives HA restarts. Install via
+PackageManager or `bootstrap.sh`.
+
+```
+dbus-evcharger      victron-venus    main
+dbus-ev             victron-venus    main
+```
+
+Verify: `mosquitto_sub -h <cerbo> -t 'victron/charger/#' -v` shows live state.
+
+## 6c. Water tank / pump (optional)
+
+`dbus-pump` exposes a water tank level and pump control on D-Bus so Venus OS
+shows it like a built-in sensor.
+
+```
+dbus-pump           victron-venus    main
+```
+
 ## Troubleshooting
 
 | Symptom | Check |
@@ -149,7 +171,8 @@ docker compose up --abort-on-container-exit
 | No battery on VRM | ESP32 MQTT + dbus-mqtt-battery logs (`logread -f`) |
 | No PV on D-Bus | Tasmota MQTT + dbus-tasmota-pv HTTP reachability |
 | Dashboard empty | `mosquitto_sub -h <cerbo> -t 'inverter/state' -v` |
-| Control not adjusting | inverter-control D-Bus permissions, HA entity IDs |
+| Control not adjusting | inverter-control D-Bus permissions, governance gates |
+| EV not appearing | `mosquitto_sub -h <cerbo> -t 'N/<id>/evcharger/#'` — confirm broker reachability |
 
 ## Related docs
 
