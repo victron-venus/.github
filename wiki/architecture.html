@@ -57,8 +57,8 @@ or a consumer on one side of it.</p>
 <div class="layers">
   <div class="layer">
     <h3>1 · Hardware &amp; sensing</h3>
-    <p>ESP32s, Tasmota plugs, CT clamps, Emporia Vue submeters. Firmware publishes raw readings.
-    <a href="https://github.com/victron-venus/esphome-jbd-bms-mqtt">esphome-jbd-bms-mqtt</a><a href="https://github.com/victron-venus/dbus-esphome-grid-sensor">dbus-esphome-grid-sensor</a></p>
+    <p>ESP32s, Tasmota plugs, CT clamps, Emporia Vue submeters, EV chargers (OCPP), water tanks/pumps. Firmware publishes raw readings.
+    <a href="https://github.com/victron-venus/esphome-jbd-bms-mqtt">esphome-jbd-bms-mqtt</a><a href="https://github.com/victron-venus/dbus-esphome-grid-sensor">dbus-esphome-grid-sensor</a><a href="https://github.com/victron-venus/dbus-evcharger">dbus-evcharger</a><a href="https://github.com/victron-venus/dbus-pump">dbus-pump</a></p>
   </div>
   <div class="layer">
     <h3>2 · D-Bus services</h3>
@@ -67,8 +67,8 @@ or a consumer on one side of it.</p>
   </div>
   <div class="layer">
     <h3>3 · Control &amp; policy</h3>
-    <p>The only layer allowed to <em>write</em> to the inverter. inverter-control decides setpoints; venus-os-governance gates every command against SOC limits and policies; dbus-event-log records both.
-    <a href="https://github.com/victron-venus/inverter-control">inverter-control</a><a href="https://github.com/victron-venus/venus-os-governance">venus-os-governance</a><a href="https://github.com/victron-venus/dbus-event-log">dbus-event-log</a></p>
+    <p>The only layer allowed to <em>write</em> to the inverter. inverter-control decides setpoints; venus-os-governance gates every command against SOC limits and policies; dbus-event-log records both. EV data now sourced from D-Bus, not Home Assistant.
+    <a href="https://github.com/victron-venus/inverter-control">inverter-control</a><a href="https://github.com/victron-venus/venus-os-governance">venus-os-governance</a><a href="https://github.com/victron-venus/dbus-event-log">dbus-event-log</a><a href="https://github.com/victron-venus/dbus-ev">dbus-ev</a></p>
   </div>
   <div class="layer">
     <h3>4 · MQTT distribution</h3>
@@ -78,7 +78,7 @@ or a consumer on one side of it.</p>
   <div class="layer">
     <h3>5 · Consumption</h3>
     <p>Dashboards (Go binary on-GX, Python/Docker, Vue SPA, Tauri desktop), Home Assistant, observability stacks, and the LangGraph forecaster feeding pre-charge hints back into control.
-    <a href="https://github.com/victron-venus/inverter-dashboard-go">inverter-dashboard-go</a><a href="https://github.com/4alvit/solar-forecast-langgraph">solar-forecast-langgraph</a><a href="https://github.com/victron-venus/venus-os-observability">venus-os-observability</a></p>
+    <a href="https://github.com/victron-venus/inverter-dashboard-go">inverter-dashboard-go</a><a href="https://github.com/4alvit/solar-forecast-langgraph">solar-forecast-langgraph</a><a href="https://github.com/victron-venus/venus-os-observability">venus-os-observability</a><a href="https://github.com/victron-venus/inverter-monitoring">inverter-monitoring</a></p>
   </div>
 </div>
 
@@ -108,6 +108,7 @@ on the bus the OS controls, and convenience paths on the protocol every tool alr
 <ul>
   <li><strong>Forecasting loop:</strong> solar-forecast-langgraph reads MQTT history plus OpenMeteo, then asks inverter-control to pre-charge before cloudy periods — closing the loop through the same governed write path.</li>
   <li><strong>AI access:</strong> mcp-venus-os exposes reads freely but routes writes through the same safety constraints as any other client.</li>
+  <li><strong>EV data path:</strong> dbus-ev and dbus-evcharger source EV charging data from the Cerbo's own MQTT broker — not Home Assistant — so the telemetry chain stays on-device and survives HA restarts.</li>
   <li><strong>Testing:</strong> integration-tests runs the bridge services against a real broker and simulated D-Bus peers in CI, so a firmware change upstream can't silently break the chain.</li>
 </ul>
 

@@ -101,7 +101,7 @@ victron/event/dbus                 # dbus-event-log audit stream</code></pre>
 ├── config.ini               # instance settings
 ├── install.sh               # idempotent installer
 └── README.md</code></pre>
-<p>Scaffold a new service instead of hand-rolling the boilerplate:</p>
+<p>Scaffold a new service instead of hand-rolling the boilerplate. The template now includes a generation-test job that renders and tests the copier output in CI.</p>
 <pre><code>copier copy https://github.com/4alvit/dbus-service-template my-dbus-service</code></pre>
 
 <h2>Rules that keep the fleet debuggable</h2>
@@ -110,6 +110,8 @@ victron/event/dbus                 # dbus-event-log audit stream</code></pre>
   <li><strong>Reconnect loops with backoff</strong> — MQTT and D-Bus drop during GX reboots; treat disconnects as normal.</li>
   <li><strong>One service, one job.</strong> Translation, decision-making, and audit live in separate processes (see <a href="architecture.html">architecture</a>).</li>
   <li><strong>Register writes with governance.</strong> Any service issuing control commands must route them through venus-os-governance gates so dbus-event-log sees them.</li>
+  <li><strong>EV data from D-Bus.</strong> dbus-ev/dbus-evcharger read from the Cerbo's MQTT broker, not Home Assistant — the telemetry path must survive HA restarts.</li>
+  <li><strong>Daemontools logging.</strong> Services like dbus-tasmota-pv use the multilog daemontools pair for log rotation; others use stdout capture. Check each repo's service/run for the pattern.</li>
 </ul>
 
 <p style="margin-top:2rem"><a href="https://github.com/victron-venus/venus-os-integration-patterns">Working reference implementations →</a></p>
