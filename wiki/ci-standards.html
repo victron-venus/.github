@@ -60,7 +60,7 @@ call reusable workflows — no per-repo copies of lint/test logic to drift apart
     <tr><td>python-ci.yml</td><td>ruff lint · mypy · pytest · coverage gate → Codecov</td></tr>
     <tr><td>go-ci.yml</td><td>golangci-lint · govulncheck · tests · coverage gate → Codecov</td></tr>
     <tr><td>scorecard.yml</td><td>OSSF Scorecard → SARIF uploaded to code scanning (avoids the api.scorecard.dev timeout)</td></tr>
-    <tr><td>auto-approve.yml</td><td>Auto-approves Dependabot/Renovate PRs via hmarr/auto-approve-action</td></tr>
+    <tr><td>auto-approve.yml</td><td>Auto-approves Dependabot/Renovate PRs via hmarr/auto-approve-action — dismisses stale approvals before re-approving</td></tr>
   </tbody>
 </table>
 </div>
@@ -81,6 +81,7 @@ call reusable workflows — no per-repo copies of lint/test logic to drift apart
   instead of a human approval.</li>
   <li><strong>Conventional Commits.</strong> <code>feat:</code>, <code>fix:</code>,
   <code>docs:</code>, <code>chore:</code> — release tooling parses them.</li>
+  <li><strong>Auto-approve hygiene.</strong> The reusable auto-approve workflow dismisses its own stale approval before re-approving, and the retry window is 30 minutes (not 15s).</li>
 </ul>
 
 <h2>Releases</h2>

@@ -72,6 +72,8 @@ today — most people begin with battery sensing or the dashboard, not everythin
     <tr><td>Docker UI (optional)</td><td>inverter-dashboard</td><td>Docker on NAS: <code>alvit/inverter-dashboard</code></td></tr>
     <tr><td>Desktop client (optional)</td><td>inverter-desktop</td><td>Release installer per platform</td></tr>
     <tr><td>Long-term metrics</td><td>inverter-monitoring</td><td>Docker on NAS (Telegraf + InfluxDB + Grafana)</td></tr>
+    <tr><td>EV charging</td><td>dbus-evcharger + dbus-ev</td><td>Venus PackageManager or <code>bootstrap.sh</code></td></tr>
+    <tr><td>Water tank/pump</td><td>dbus-pump</td><td>Venus PackageManager or <code>bootstrap.sh</code></td></tr>
   </tbody>
 </table>
 </div>
@@ -83,7 +85,7 @@ today — most people begin with battery sensing or the dashboard, not everythin
   <li><strong>Publish to D-Bus.</strong> Install <a href="https://github.com/victron-venus/dbus-mqtt-battery">dbus-mqtt-battery</a> on the GX. The battery appears in the Venus UI immediately.</li>
   <li><strong>Add PV/grid metering</strong> if you have Tasmota plugs or a CT sensor — same pattern.</li>
   <li><strong>Dashboard.</strong> Drop <a href="https://github.com/victron-venus/inverter-dashboard-go">inverter-dashboard-go</a> onto the Cerbo; open its port from any browser.</li>
-  <li><strong>Control last.</strong> Only after metering is trustworthy, install <a href="https://github.com/victron-venus/inverter-control">inverter-control</a>. Test grid-zero behavior with conservative limits first.</li>
+  <li><strong>Control last.</strong> Only after metering is trustworthy, install <a href="https://github.com/victron-venus/inverter-control">inverter-control</a>. Test grid-zero behavior with conservative limits first. EV charging setpoints follow the same governed write path.</li>
   <li><strong>Then the extras:</strong> long-term metrics, desktop client, forecasting, observability.</li>
 </ol>
 
