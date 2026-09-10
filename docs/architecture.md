@@ -4,68 +4,80 @@ Org-level map of how [victron-venus](https://github.com/victron-venus) repos con
 
 Skim version: [organization profile README](../profile/README.md#system-architecture).
 
-GitHub Mermaid scales each diagram to page width — one giant graph becomes unreadably wide and short. Below, the stack is split into **narrow vertical** diagrams (top → bottom) so labels stay large.
+GitHub Mermaid scales **each** diagram to page width. One wide graph stays short and tiny — so this page uses several **narrow, top→bottom** diagrams instead.
 
 ## 1. Plant → Venus OS (on Cerbo)
 
-Field devices and Venus packages meet on the Cerbo over D-Bus / MQTT.
-
 ```mermaid
 flowchart TB
-    ESP["ESP32 + ESPHome"]
-    TAS["Tasmota energy meter"]
-    EVCHG["EV charger OCPP"]
-    PUMP["Water tank / pump"]
-    BMS["JBD BMS / LiFePO4"]
+    subgraph Field["Field hardware"]
+        direction TB
+        ESP["ESP32 + ESPHome"]
+        TAS["Tasmota energy meter"]
+        EVCHG["EV charger OCPP"]
+        PUMP["Water tank / pump"]
+        BMS["JBD BMS / LiFePO4"]
+    end
 
-    ESP -->|"BLE→MQTT"| BM["dbus-mqtt-battery"]
-    ESP -.->|"BLE→MQTT"| ESPH["esphome-jbd-bms-mqtt"]
+    subgraph Pkgs["Venus OS packages"]
+        direction TB
+        BM["dbus-mqtt-battery"]
+        PV["dbus-tasmota-pv"]
+        EMP["dbus-emporia-vue"]
+        GRD["dbus-esphome-grid-sensor"]
+        EV["dbus-evcharger / dbus-ev"]
+        PMP["dbus-pump"]
+        IC["inverter-control"]
+        EL["dbus-event-log"]
+        OBS["venus-os-observability"]
+        ESPH["esphome-jbd-bms-mqtt"]
+    end
+
+    Field -->|"sensors / MQTT / HTTP"| Pkgs
+    Pkgs -->|"D-Bus"| CERBO["Cerbo GX / Venus OS"]
+
+    ESP -.-> BM
+    ESP -.-> ESPH
     ESPH -.-> BM
-    TAS -->|"HTTP"| PV["dbus-tasmota-pv"]
-    EVCHG -.->|"MQTT"| EV["dbus-evcharger / dbus-ev"]
-    PUMP -.->|"MQTT"| PMP["dbus-pump"]
-
-    EMP["dbus-emporia-vue"]
-    GRD["dbus-esphome-grid-sensor"]
-    IC["inverter-control"]
-    EL["dbus-event-log"]
-    OBS["venus-os-observability"]
-
-    BM -->|"D-Bus"| CERBO["Cerbo GX / Venus OS"]
-    PV -->|"D-Bus"| CERBO
-    EMP -->|"D-Bus"| CERBO
-    GRD -->|"D-Bus"| CERBO
-    EV -->|"D-Bus"| CERBO
-    PMP -->|"D-Bus"| CERBO
-    IC -->|"D-Bus"| CERBO
-    EL -->|"D-Bus monitor"| CERBO
-    OBS -->|"OTel"| CERBO
+    TAS -.-> PV
+    EVCHG -.-> EV
+    PUMP -.-> PMP
 
     style CERBO fill:#e67e22,color:#fff
     style IC fill:#4ecdc4,color:#000
     style OBS fill:#8e44ad,color:#fff
 ```
 
-## 2. MQTT → dashboards & edge
+Protocols in short: ESP/BMS → MQTT → `dbus-mqtt-battery`; Tasmota HTTP → `dbus-tasmota-pv`; EV/pump MQTT → `dbus-evcharger` / `dbus-pump`; packages expose D-Bus on Cerbo; `inverter-control` / `dbus-event-log` / `venus-os-observability` attach on D-Bus too.
 
-Cerbo / control publish into MQTT; UIs and the public edge consume it.
+## 2. MQTT → dashboards & edge
 
 ```mermaid
 flowchart TB
-    IC["inverter-control"] -->|"inverter/state"| MQTT["MQTT broker"]
-    FG["fastapi-mqtt-gateway"] -.->|"REST/WS"| MQTT
-    MO["mqtt-observability-otel"] -.->|"metrics/traces"| MQTT
-    SF["solar-forecast-langgraph"] -->|"forecast"| MQTT
+    subgraph Pub["Publishers"]
+        direction TB
+        IC["inverter-control"]
+        FG["fastapi-mqtt-gateway"]
+        MO["mqtt-observability-otel"]
+        SF["solar-forecast-langgraph"]
+    end
 
-    MQTT --> IGW["inverter-gateway"]
-    IGW -->|"HTTPS + Access"| VIT["inverter-web-vitrine"]
+    MQTT["MQTT broker"]
 
-    MQTT --> DGO["inverter-dashboard-go"]
-    MQTT --> DPY["inverter-dashboard"]
-    MQTT --> DVUE["inverter-dashboard-vue"]
-    MQTT --> DT["inverter-desktop"]
-    MQTT --> MON["inverter-monitoring"]
-    MQTT --> MCP["mcp-venus-os"]
+    subgraph Cons["Consumers"]
+        direction TB
+        IGW["inverter-gateway"]
+        VIT["inverter-web-vitrine"]
+        DGO["inverter-dashboard-go"]
+        DPY["inverter-dashboard"]
+        DVUE["inverter-dashboard-vue"]
+        DT["inverter-desktop"]
+        MON["inverter-monitoring"]
+        MCP["mcp-venus-os"]
+    end
+
+    Pub --> MQTT --> Cons
+    IGW -->|"HTTPS + Access"| VIT
 
     style MQTT fill:#2c3e50,color:#fff
     style IGW fill:#f48120,color:#fff
@@ -80,12 +92,12 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    RAG["energy-data-rag-pipeline"] -->|"RAG"| DOCS["Victron docs + community"]
+    RAG["energy-data-rag-pipeline"] --> DOCS["Victron docs + community"]
 ```
 
 ## Development & ops
 
-No edges into the live energy path (listed so they do not distort layout):
+No edges into the live energy path (table on purpose — a disconnected Mermaid subgraph blows out layout):
 
 | Repo | Role |
 |------|------|
