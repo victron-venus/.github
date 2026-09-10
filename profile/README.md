@@ -14,105 +14,26 @@ Created by [@4alvit](https://github.com/4alvit).
 ## System architecture
 
 ```mermaid
-flowchart TB
-    subgraph HW["Hardware"]
-        direction TB
-        CERBO["Cerbo GX / Venus OS"]
-        ~~~ BMS["JBD BMS / LiFePO4"]
-        ~~~ ESP["ESP32 + ESPHome"]
-        ~~~ TAS["Tasmota energy meter"]
-        ~~~ EVCHG["EV charger (OCPP)"]
-        ~~~ PUMP["Water tank / pump"]
-    end
+flowchart LR
+    HW["Hardware\nCerbo GX + meters / BMS / EV / pump"]
+    VENUS["Venus OS packages\ndbus-* · inverter-control · event-log · OTel"]
+    MQTT["MQTT broker"]
+    UI["Dashboards & tools\ngo / python / vue / desktop / mcp"]
+    EDGE["inverter-gateway\n+ web vitrine"]
+    MON["inverter-monitoring\nTelegraf / Influx / Grafana"]
 
-    subgraph CTL["Control (Venus OS packages)"]
-        direction TB
-        BM["dbus-mqtt-battery"]
-        ~~~ PV["dbus-tasmota-pv"]
-        ~~~ EMP["dbus-emporia-vue"]
-        ~~~ GRD["dbus-esphome-grid-sensor"]
-        ~~~ EV["dbus-evcharger / dbus-ev"]
-        ~~~ PMP["dbus-pump"]
-        ~~~ IC["inverter-control"]
-        ~~~ EL["dbus-event-log"]
-        ~~~ OBS["venus-os-observability"]
-    end
-
-    subgraph BRG["Bridge services"]
-        direction TB
-        ESPH["esphome-jbd-bms-mqtt"]
-        ~~~ FG["fastapi-mqtt-gateway"]
-        ~~~ MO["mqtt-observability-opentelemetry"]
-    end
-
-    subgraph DAT["Data & analytics"]
-        direction TB
-        RAG["energy-data-rag-pipeline"]
-        ~~~ SF["solar-forecast-langgraph"]
-    end
-
-    subgraph DEV["Development & ops"]
-        direction TB
-        IT["integration-tests"]
-        ~~~ TFV["terraform-github-victron"]
-        ~~~ TF4["terraform-github-4alvit"]
-        ~~~ BUILD["iot-project-builder-profile (4alvit)"]
-        ~~~ CITK["venus-os-ci-toolkit"]
-    end
-
-    subgraph UI["Monitoring & dashboards"]
-        direction TB
-        MQTT["MQTT broker"]
-        ~~~ IGW["inverter-gateway"]
-        ~~~ DGO["inverter-dashboard-go"]
-        ~~~ DPY["inverter-dashboard"]
-        ~~~ DVUE["inverter-dashboard-vue"]
-        ~~~ DT["inverter-desktop"]
-        ~~~ MON["inverter-monitoring"]
-        ~~~ VIT["inverter-web-vitrine"]
-        ~~~ MCP["mcp-venus-os"]
-    end
-
-    ESP -->|"BLE→MQTT"| BM
-    TAS -->|"HTTP"| PV
-    EVCHG -.->|"MQTT"| EV
-    PUMP -.->|"MQTT"| PMP
-    BM -->|"D-Bus"| CERBO
-    PV -->|"D-Bus"| CERBO
-    EMP -->|"D-Bus"| CERBO
-    GRD -->|"D-Bus"| CERBO
-    EV -->|"D-Bus"| CERBO
-    PMP -->|"D-Bus"| CERBO
-    IC -->|"D-Bus"| CERBO
-    EL -->|"D-Bus monitor"| CERBO
-    OBS -->|"OTel tracing"| CERBO
-
-    ESP -.->|"BLE→MQTT"| ESPH
-    ESPH -.-> BM
-    FG -.->|"REST/WS→MQTT"| MQTT
-    MO -.->|"OTel→metrics/traces"| MQTT
-
-    IC -->|"inverter/state"| MQTT
-    RAG -->|"RAG pipeline"| DOCS["Victron docs + community"]
-    SF -->|"Forecast"| MQTT
-
-    MQTT --> IGW
-    IGW -->|"HTTPS + Access"| VIT
-    MQTT --> DGO
-    MQTT --> DPY
-    MQTT --> DVUE
-    MQTT --> DT
+    HW -->|"D-Bus"| VENUS
+    VENUS -->|"state / metrics"| MQTT
+    MQTT --> UI
+    MQTT --> EDGE
     MQTT --> MON
-    MQTT --> MCP
 
-    style IC fill:#4ecdc4,color:#000
-    style DGO fill:#00ADD8,color:#fff
-    style DPY fill:#3776ab,color:#fff
-    style DT fill:#24c8db,color:#000
-    style OBS fill:#8e44ad,color:#fff
-    style IGW fill:#f48120,color:#fff
-    style VIT fill:#5b8cff,color:#fff
+    style VENUS fill:#4ecdc4,color:#000
+    style EDGE fill:#f48120,color:#fff
+    style UI fill:#00ADD8,color:#fff
 ```
+
+[Detailed architecture →](../docs/architecture.md) (full repo graph and protocols).
 
 > **ESP32 setup:** Flash [esphome-jbd-bms-mqtt](https://github.com/victron-venus/esphome-jbd-bms-mqtt) separately (not via Venus PackageManager). See [INSTALL.md](../docs/INSTALL.md).
 
