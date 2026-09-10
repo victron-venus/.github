@@ -5,22 +5,37 @@ Org-level map of how [victron-venus](https://github.com/victron-venus) repos con
 For a skim-friendly version see the [organization profile README](../profile/README.md#system-architecture).
 This page keeps the full repo-level graph (protocols and package names).
 
-## Full stack
+## Development & ops (no runtime edges)
+
+These repos support the org but do not sit on the live energy data path, so they stay out of the main graph (keeps layout compact).
 
 ```mermaid
 flowchart LR
+    IT["integration-tests"]
+    TFV["terraform-github-victron"]
+    TF4["terraform-github-4alvit"]
+    BUILD["iot-project-builder-profile"]
+    CITK["venus-os-ci-toolkit"]
+```
+
+## Full stack (runtime)
+
+Top → bottom: plant hardware, Venus packages on the Cerbo, then MQTT consumers. Bridge / analytics feed MQTT from the side.
+
+```mermaid
+flowchart TB
     subgraph HW["Hardware"]
-        direction TB
-        CERBO["Cerbo GX / Venus OS"]
-        BMS["JBD BMS / LiFePO4"]
+        direction LR
         ESP["ESP32 + ESPHome"]
         TAS["Tasmota energy meter"]
         EVCHG["EV charger (OCPP)"]
         PUMP["Water tank / pump"]
+        BMS["JBD BMS / LiFePO4"]
+        CERBO["Cerbo GX / Venus OS"]
     end
 
-    subgraph CTL["Control (Venus OS packages)"]
-        direction TB
+    subgraph CTL["Control — Venus OS packages on Cerbo"]
+        direction LR
         BM["dbus-mqtt-battery"]
         PV["dbus-tasmota-pv"]
         EMP["dbus-emporia-vue"]
@@ -32,46 +47,44 @@ flowchart LR
         OBS["venus-os-observability"]
     end
 
-    subgraph BRG["Bridge services"]
-        direction TB
-        ESPH["esphome-jbd-bms-mqtt"]
-        FG["fastapi-mqtt-gateway"]
-        MO["mqtt-observability-opentelemetry"]
-    end
-
-    subgraph DAT["Data & analytics"]
-        direction TB
-        RAG["energy-data-rag-pipeline"]
-        SF["solar-forecast-langgraph"]
-        DOCS["Victron docs + community"]
-    end
-
-    subgraph DEV["Development & ops"]
-        direction TB
-        IT["integration-tests"]
-        TFV["terraform-github-victron"]
-        TF4["terraform-github-4alvit"]
-        BUILD["iot-project-builder-profile"]
-        CITK["venus-os-ci-toolkit"]
+    subgraph SIDE["Off-Cerbo feeds"]
+        direction LR
+        subgraph BRG["Bridge services"]
+            direction TB
+            ESPH["esphome-jbd-bms-mqtt"]
+            FG["fastapi-mqtt-gateway"]
+            MO["mqtt-observability-opentelemetry"]
+        end
+        subgraph DAT["Data & analytics"]
+            direction TB
+            RAG["energy-data-rag-pipeline"]
+            SF["solar-forecast-langgraph"]
+            DOCS["Victron docs + community"]
+        end
     end
 
     subgraph UI["Monitoring & dashboards"]
-        direction TB
+        direction LR
         MQTT["MQTT broker"]
         IGW["inverter-gateway"]
+        VIT["inverter-web-vitrine"]
         DGO["inverter-dashboard-go"]
         DPY["inverter-dashboard"]
         DVUE["inverter-dashboard-vue"]
         DT["inverter-desktop"]
         MON["inverter-monitoring"]
-        VIT["inverter-web-vitrine"]
         MCP["mcp-venus-os"]
     end
 
+    %% Hardware / field → Venus packages
     ESP -->|"BLE→MQTT"| BM
     TAS -->|"HTTP"| PV
     EVCHG -.->|"MQTT"| EV
     PUMP -.->|"MQTT"| PMP
+    ESP -.->|"BLE→MQTT"| ESPH
+    ESPH -.-> BM
+
+    %% Packages ↔ Cerbo D-Bus
     BM -->|"D-Bus"| CERBO
     PV -->|"D-Bus"| CERBO
     EMP -->|"D-Bus"| CERBO
@@ -82,14 +95,15 @@ flowchart LR
     EL -->|"D-Bus monitor"| CERBO
     OBS -->|"OTel tracing"| CERBO
 
-    ESP -.->|"BLE→MQTT"| ESPH
-    ESPH -.-> BM
-    FG -.->|"REST/WS→MQTT"| MQTT
-    MO -.->|"OTel→metrics/traces"| MQTT
+    %% Rank hint: keep HW above CTL above UI
+    HW --> CTL
+    CTL --> UI
 
     IC -->|"inverter/state"| MQTT
-    RAG -->|"RAG pipeline"| DOCS
+    FG -.->|"REST/WS→MQTT"| MQTT
+    MO -.->|"OTel→metrics/traces"| MQTT
     SF -->|"Forecast"| MQTT
+    RAG -->|"RAG pipeline"| DOCS
 
     MQTT --> IGW
     IGW -->|"HTTPS + Access"| VIT
@@ -107,6 +121,8 @@ flowchart LR
     style OBS fill:#8e44ad,color:#fff
     style IGW fill:#f48120,color:#fff
     style VIT fill:#5b8cff,color:#fff
+    style CERBO fill:#e67e22,color:#fff
+    style MQTT fill:#2c3e50,color:#fff
 ```
 
 ## How to read it
@@ -118,6 +134,6 @@ flowchart LR
 | Bridge | Off-Cerbo bridges that feed MQTT / BMS |
 | Monitoring & dashboards | MQTT consumers, gateway, UIs |
 | Data & analytics | Forecast / RAG (optional) |
-| Development & ops | CI, Terraform, org tooling |
+| Development & ops | CI, Terraform, org tooling (separate diagram above) |
 
 Install path for a typical home stack: [INSTALL.md](./INSTALL.md).
