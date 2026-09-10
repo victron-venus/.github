@@ -1,6 +1,6 @@
 # Full stack install guide
 
-End-to-end setup for a Victron Venus home energy stack: **Cerbo GX + ESP32 BMS + Tasmota PV + control + dashboard**.
+End-to-end setup for a Victron Venus home energy stack: **Cerbo GX + ESP32 BMS + Tasmota PV + control + dashboard**.\n\nArchitecture map: [architecture.md](./architecture.md).
 
 Created by [@4alvit](https://github.com/4alvit).
 
