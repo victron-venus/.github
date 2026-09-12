@@ -115,7 +115,7 @@ Full stack install guide: **[docs/INSTALL.md](../docs/INSTALL.md)**
 Quick Cerbo bootstrap (Venus packages only):
 
 ```bash
-git clone https://github.com/victron-venus/inverter-control.git  # or use bootstrap.sh from a local checkout
+git clone https://github.com/victron-venus/inverter-control.git
 # See inverter-control README for SetupHelper / PackageManager install
 ```
 

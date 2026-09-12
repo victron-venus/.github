@@ -49,8 +49,7 @@
 <p class="eyebrow">03 · Integration</p>
 <h1 style="font-family:var(--font-display);font-size:clamp(1.7rem,2.5vw+0.5rem,2.4rem);margin-top:0.75rem">Writing for Venus OS</h1>
 <p style="margin-top:0.75rem">Conventions shared by every service in this ecosystem. Follow them and
-your service behaves like the built-in ones — visible in the remote console, controllable by the ESS,
-auditable by the policy engine.</p>
+validate service discovery, numeric path types, freshness and resource use against the target firmware.</p>
 
 <h2>D-Bus service naming</h2>
 <p>Venus OS discovers services by their bus name. The pattern:</p>
@@ -70,51 +69,35 @@ type means the GX ignores your service no matter how correct the paths are.</p>
   <thead><tr><th>Path</th><th>Meaning</th></tr></thead>
   <tbody>
     <tr><td>/ProductId, /ProductName</td><td>Identity shown in the device list</td></tr>
-    <tr><td>/Connected</td><td>Liveness — Venus hides services reporting 0</td></tr>
+    <tr><td>/Connected</td><td>Source availability; report 0 when required inputs are unavailable</td></tr>
     <tr><td>/Status or /ErrorCode</td><td>Fault visibility without opening logs</td></tr>
     <tr><td>Type-specific values</td><td>e.g. /Dc/0/Voltage, /Ac/Power, /Soc</td></tr>
   </tbody>
 </table>
 </div>
 
-<h2>MQTT topic conventions</h2>
-<p>Telemetry mirrors use a stable prefix so subscribers can wildcard safely:</p>
-<pre><code>victron/&lt;source&gt;/&lt;device&gt;/&lt;metric&gt;
-
-victron/battery/jbd_1/Soc          # percent
-victron/grid/meter_1/Power         # watts, signed
-victron/inverter/state             # control-layer state changes
-victron/event/dbus                 # dbus-event-log audit stream</code></pre>
-<ul>
-  <li><strong>Retained state topics.</strong> Current-value topics publish retained so dashboards render instantly after reconnect.</li>
-  <li><strong>Events are not retained.</strong> Audit and event streams replay from storage (SQLite/TimescaleDB), not from the broker.</li>
-  <li><strong>No secrets in topics.</strong> ACLs belong in broker config; see fastapi-mqtt-gateway for the authenticated gateway pattern.</li>
-</ul>
-
-<h2>Installing as a package</h2>
-<p>All on-device services ship as Venus OS packages installable via PackageManager or
-<code>bootstrap.sh</code>. The layout follows the
-<a href="https://github.com/4alvit/dbus-service-template">dbus-service-template</a>:</p>
-<pre><code>service-name/
-├── service/run              # supervise script
-├── dbus-service.py          # entry point
-├── config.ini               # instance settings
-├── install.sh               # idempotent installer
-└── README.md</code></pre>
-<p>Scaffold a new service instead of hand-rolling the boilerplate. The template now includes a generation-test job that renders and tests the copier output in CI.</p>
-<pre><code>copier copy https://github.com/4alvit/dbus-service-template my-dbus-service</code></pre>
-
+<h2>MQTT contracts</h2>
+<p>Native Venus telemetry uses <code>N/&lt;portal-id&gt;/&lt;service&gt;/&lt;instance&gt;/&lt;path&gt;</code>; read requests use <code>R/&lt;portal-id&gt;/...</code>. Raw ESPHome/Tasmota sensor topics and application <code>inverter/state</code> use separate schemas. Use the publisher's README and a real portal ID. Do not assume a universal <code>victron/#</code> namespace.</p>
+<h2>Native installation contract</h2>
+<pre><code>/data/service-name/
+  service/service-name/run
+  service/service-name/log/run
+  application files and local configuration
+/service/service-name -> /data/service-name/service/service-name</code></pre>
+<p>Recreate the link from <code>/data/rc.local</code> before any early exit. Use <code>svc</code> and <code>svstat</code>, preserve service directory inodes on updates, and install dependencies before stopping the service. Firmware replaces rootfs files; keep persistent state under <code>/data</code>. See the <a href="install.html">installation guide</a> and the <a href="https://github.com/4alvit/dbus-service-template">service template</a>.</p>
+<h2>D-Bus value contract</h2>
+<p>Register all required paths before publishing the service name. Publish numeric values as numbers and unavailable measurements using the standard invalid value, not fabricated zero. Apply MQTT-thread updates on the GLib loop. Prefer batched ItemsChanged signals and bounded reconnection with backoff. A <code>/BatteryCapacity</code> string caused the stock VRM logger to crash in the September 2026 audit.</p>
 <h2>Rules that keep the fleet debuggable</h2>
 <ul>
-  <li><strong>Log to stdout/stderr</strong> — daemontools captures it under the service directory; never background yourself.</li>
+  <li><strong>Log to stdout/stderr</strong> — multilog writes it to the configured bounded log directory; never background yourself.</li>
   <li><strong>Reconnect loops with backoff</strong> — MQTT and D-Bus drop during GX reboots; treat disconnects as normal.</li>
   <li><strong>One service, one job.</strong> Translation, decision-making, and audit live in separate processes (see <a href="architecture.html">architecture</a>).</li>
-  <li><strong>Register writes with governance.</strong> Any service issuing control commands must route them through venus-os-governance gates so dbus-event-log sees them.</li>
-  <li><strong>EV data from D-Bus.</strong> dbus-ev/dbus-evcharger read from the Cerbo's MQTT broker, not Home Assistant — the telemetry path must survive HA restarts.</li>
+  <li><strong>Verify control integration.</strong> No governance or event-log service was running on the audited GX. Repository availability alone does not prove that live writes are mediated or audited. Inspect the deployed controller and validate each accepted D-Bus write.</li>
+  <li><strong>HA availability matters.</strong> dbus-ev and dbus-evcharger read Home Assistant and publish to D-Bus; inverter-control consumes those D-Bus values. Mark unavailable source data correctly during HA outages.</li>
   <li><strong>Daemontools logging.</strong> Services like dbus-tasmota-pv use the multilog daemontools pair for log rotation; others use stdout capture. Check each repo's service/run for the pattern.</li>
 </ul>
 
-<p style="margin-top:2rem"><a href="https://github.com/victron-venus/venus-os-integration-patterns">Working reference implementations →</a></p>
+<p style="margin-top:2rem"><a href="https://github.com/victron-venus/venus-os-integration-patterns">Integration patterns and their deployment limitations →</a></p>
 </article>
 </div>
 </main>
