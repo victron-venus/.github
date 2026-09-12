@@ -56,6 +56,26 @@ layout, offline dependencies, bounded logs and service lifecycle separately.
 The September audit's documentation correction is maintained here without
 reopening or deploying the archived repository.
 
+## Release webhooks and retries
+
+Check the existing release webhook and package auto-update settings before
+publishing a tag. A release can trigger installation independently of the
+interactive maintenance session.
+
+The audited NAS controller webhook runs installation synchronously through one
+Gunicorn worker. During the 1.23.2 release, processing occupied the worker for
+about 20 seconds: GitHub recorded delivery timeouts, although device verification
+confirmed that installation completed. The subsequent `released` event was
+eventually ignored after waiting behind the `published` request.
+
+Verify the installed version, shipped file hashes, service state and fresh
+controller heartbeat before redelivery, and confirm that no installer or
+maintenance helper is still active. A version file alone does not prove a
+complete install. The current controller webhook checks the version after
+installation and has no delivery-ID deduplication or asynchronous job queue;
+redelivery can repeat the update and restart services. Delivery status and
+device installation status must be assessed separately.
+
 ## MQTT
 
 Use the GX's existing broker or a documented external broker. Venus OS v3.75 on the audited device uses FlashMQ. Do not start another system D-Bus daemon or install a second broker as part of a bridge installer.

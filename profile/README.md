@@ -16,7 +16,7 @@ Created by [@4alvit](https://github.com/4alvit).
 ```mermaid
 flowchart LR
     HW["Hardware\nCerbo GX + meters / BMS / EV / pump"]
-    VENUS["Venus OS packages\ndbus-* · inverter-control · event-log · OTel"]
+    VENUS["Venus OS packages\ndbus-* · inverter-control · OTel"]
     MQTT["MQTT broker"]
     UI["Dashboards & tools\ngo / python / vue / desktop / mcp"]
     EDGE["inverter-gateway\n+ web vitrine"]
@@ -48,12 +48,12 @@ flowchart LR
 | [dbus-tasmota-pv](https://github.com/victron-venus/dbus-tasmota-pv) | Tasmota power meter → D-Bus PV inverter (daemontools multilog) |
 | [dbus-emporia-vue](https://github.com/victron-venus/dbus-emporia-vue) | Emporia Vue submeters → D-Bus AC load (one per channel) |
 | [dbus-esphome-grid-sensor](https://github.com/victron-venus/dbus-esphome-grid-sensor) | ESP32 CT sensor → D-Bus grid meter |
-| [dbus-evcharger](https://github.com/victron-venus/dbus-evcharger) | EV charge point → D-Bus charger (OCPP via Cerbo MQTT) |
+| [dbus-evcharger](https://github.com/victron-venus/dbus-evcharger) | Home Assistant charge point data → D-Bus charger |
 | [dbus-ev](https://github.com/victron-venus/dbus-ev) | EV charging session data → D-Bus |
 | [dbus-pump](https://github.com/victron-venus/dbus-pump) | Water tank level / pump → D-Bus tank |
 | [dbus-virtual-battery](https://github.com/victron-venus/dbus-virtual-battery) | Virtual battery for no-BMS chains |
-| [dbus-event-log](https://github.com/victron-venus/dbus-event-log) | Audit log of D-Bus commands & state transitions |
-| [dbus-service-template](https://github.com/4alvit/dbus-service-template) | Copier template for new D-Bus services (generation-test in CI) |
+| [dbus-event-log](https://github.com/victron-venus/dbus-event-log) | Optional audit log library/CLI; no validated native SetupHelper installer |
+| [dbus-service-template](https://github.com/4alvit/dbus-service-template) | Template renderer for new D-Bus services (generation-test in CI) |
 | [esphome-jbd-bms-mqtt](https://github.com/victron-venus/esphome-jbd-bms-mqtt) | ESP32 BLE proxy for JBD BMS → MQTT |
 | [esphome-ble-sensor-patterns](https://github.com/4alvit/esphome-ble-sensor-patterns) | Production-ready ESPHome BLE sensor configurations |
 
@@ -78,7 +78,7 @@ flowchart LR
 | [mqtt-observability-opentelemetry](https://github.com/4alvit/mqtt-observability-opentelemetry) | OpenTelemetry observability for MQTT IoT systems |
 | [venus-os-observability](https://github.com/victron-venus/venus-os-observability) | OTel/Prometheus for Venus OS — D-Bus tracing, metrics export (daemontools) |
 | [venus-os-ci-toolkit](https://github.com/victron-venus/venus-os-ci-toolkit) | Reusable GitHub Actions workflows (lint, test, coverage, Scorecard) — pinned to commit SHA |
-| [mcp-venus-os](https://github.com/victron-venus/mcp-venus-os) | MCP server for Venus OS D-Bus/MQTT management |
+| [mcp-venus-os](https://github.com/4alvit/mcp-venus-os) | Companion MCP server for Venus OS D-Bus/MQTT management |
 
 ### Data & AI
 

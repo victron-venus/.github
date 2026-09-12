@@ -48,26 +48,26 @@
 <article class="prose">
 <p class="eyebrow">02 · Architecture</p>
 <h1 style="font-family:var(--font-display);font-size:clamp(1.7rem,2.5vw+0.5rem,2.4rem);margin-top:0.75rem">How the system fits together</h1>
-<p style="margin-top:0.75rem">One rule drives the whole design: <strong>Venus OS speaks D-Bus,
-everything else speaks MQTT.</strong> Every project here is either a translator at that boundary
-or a consumer on one side of it.</p>
+<p style="margin-top:0.75rem">Venus OS models devices on its local <strong>D-Bus</strong>.
+Bridges and companion applications use MQTT, HTTP or WebSockets according to
+their own integration contracts. The repository map is not a live deployment inventory.</p>
 
 <h2>The five layers</h2>
 
 <div class="layers">
   <div class="layer">
     <h3>1 · Hardware &amp; sensing</h3>
-    <p>ESP32s, Tasmota plugs, CT clamps, Emporia Vue submeters, EV chargers (OCPP), water tanks/pumps. Firmware publishes raw readings.
+    <p>ESP32s, Tasmota plugs, CT clamps, Emporia Vue submeters, EV chargers and water tanks/pumps provide readings through firmware or configured Home Assistant entities.
     <a href="https://github.com/victron-venus/esphome-jbd-bms-mqtt">esphome-jbd-bms-mqtt</a><a href="https://github.com/victron-venus/dbus-esphome-grid-sensor">dbus-esphome-grid-sensor</a><a href="https://github.com/victron-venus/dbus-evcharger">dbus-evcharger</a><a href="https://github.com/victron-venus/dbus-pump">dbus-pump</a></p>
   </div>
   <div class="layer">
     <h3>2 · D-Bus services</h3>
-    <p>Translators running on the GX: MQTT→D-Bus for batteries, HTTP→D-Bus for PV meters, WebSocket→D-Bus for AC loads. Third-party hardware becomes native Victron devices.
+    <p>Translators running on the GX: MQTT→D-Bus for the audited battery and Tasmota PV bridges, and Home Assistant→D-Bus for Emporia, EV, charger and pump measurements. Third-party hardware appears as Victron device services.
     <a href="https://github.com/victron-venus/dbus-mqtt-battery">dbus-mqtt-battery</a><a href="https://github.com/victron-venus/dbus-tasmota-pv">dbus-tasmota-pv</a><a href="https://github.com/victron-venus/dbus-emporia-vue">dbus-emporia-vue</a></p>
   </div>
   <div class="layer">
     <h3>3 · Control &amp; policy</h3>
-    <p>The only layer allowed to <em>write</em> to the inverter. inverter-control decides setpoints; venus-os-governance gates every command against SOC limits and policies; dbus-event-log records both. EV data now sourced from D-Bus, not Home Assistant.
+    <p>inverter-control calculates setpoints and applies its configured validity, limit and watchdog policies before D-Bus writes. It consumes EV data published by the Home Assistant bridges. The archived venus-os-governance project does not gate this deployed path, and no dbus-event-log service was running on the audited GX. These repositories must not be treated as an installed authorization or audit layer.
     <a href="https://github.com/victron-venus/inverter-control">inverter-control</a><a href="https://github.com/victron-venus/venus-os-governance">venus-os-governance</a><a href="https://github.com/victron-venus/dbus-event-log">dbus-event-log</a><a href="https://github.com/victron-venus/dbus-ev">dbus-ev</a></p>
   </div>
   <div class="layer">
@@ -77,7 +77,7 @@ or a consumer on one side of it.</p>
   </div>
   <div class="layer">
     <h3>5 · Consumption</h3>
-    <p>Dashboards (Go binary on-GX, Python/Docker, Vue SPA, Tauri desktop), Home Assistant, observability stacks, and the LangGraph forecaster feeding pre-charge hints back into control.
+    <p>Dashboards (Go binary on-GX, Python/Docker, Vue SPA, Tauri desktop), Home Assistant, observability stacks and optional forecasting tools. Verify each configured caller before assuming forecasts affect controller decisions.
     <a href="https://github.com/victron-venus/inverter-dashboard-go">inverter-dashboard-go</a><a href="https://github.com/4alvit/solar-forecast-langgraph">solar-forecast-langgraph</a><a href="https://github.com/victron-venus/venus-os-observability">venus-os-observability</a><a href="https://github.com/victron-venus/inverter-monitoring">inverter-monitoring</a></p>
   </div>
 </div>
@@ -96,20 +96,20 @@ on the bus the OS controls, and convenience paths on the protocol every tool alr
   <thead><tr><th></th><th>Control path (amber)</th><th>Telemetry path (cyan)</th></tr></thead>
   <tbody>
     <tr><td>Protocol</td><td>D-Bus on-device</td><td>MQTT / REST / WebSocket</td></tr>
-    <tr><td>Writers</td><td>inverter-control via governance gates</td><td>every service publishes state</td></tr>
-    <tr><td>Audit</td><td>mandatory, via dbus-event-log</td><td>n/a</td></tr>
-    <tr><td>Latency budget</td><td>sub-second</td><td>seconds are fine</td></tr>
-    <tr><td>Failure mode</td><td>fail-safe to Victron defaults</td><td>dashboards go stale, nothing breaks</td></tr>
+    <tr><td>Writers</td><td>Configured controller and native Venus services</td><td>Per-service publishers and gateways</td></tr>
+    <tr><td>Audit</td><td>Verify actual logging; event-log is an optional integration</td><td>Configured metrics and logs</td></tr>
+    <tr><td>Timing</td><td>Control cadence plus D-Bus latency</td><td>Source-specific freshness limits</td></tr>
+    <tr><td>Failure mode</td><td>Configured validity, hold and watchdog policy</td><td>Mark unavailable inputs; stale telemetry can affect control</td></tr>
   </tbody>
 </table>
 </div>
 
 <h2>Cross-cutting concerns</h2>
 <ul>
-  <li><strong>Forecasting loop:</strong> solar-forecast-langgraph reads MQTT history plus OpenMeteo, then asks inverter-control to pre-charge before cloudy periods — closing the loop through the same governed write path.</li>
-  <li><strong>AI access:</strong> mcp-venus-os exposes reads freely but routes writes through the same safety constraints as any other client.</li>
-  <li><strong>EV data path:</strong> dbus-ev and dbus-evcharger source EV charging data from the Cerbo's own MQTT broker — not Home Assistant — so the telemetry chain stays on-device and survives HA restarts.</li>
-  <li><strong>Testing:</strong> integration-tests runs the bridge services against a real broker and simulated D-Bus peers in CI, so a firmware change upstream can't silently break the chain.</li>
+  <li><strong>Forecasting:</strong> optional forecast consumers need a configured, tested control contract; repository availability alone does not close a control loop.</li>
+  <li><strong>AI access:</strong> mcp-venus-os provides its own validation and write-confirmation rules. Verify its deployment and transport separately from the controller.</li>
+  <li><strong>EV data path:</strong> dbus-ev and dbus-evcharger read Home Assistant and publish D-Bus values for inverter-control. HA outages still require unavailable-value and recovery handling.</li>
+  <li><strong>Testing:</strong> broker and simulated D-Bus integration tests complement installer checks and device observation. Firmware compatibility and cold-boot recovery need target-device validation.</li>
 </ul>
 
 <p style="margin-top:2rem"><a href="integration.html">Next: writing your own service →</a></p>
