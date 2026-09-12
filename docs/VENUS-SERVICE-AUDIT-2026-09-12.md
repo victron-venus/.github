@@ -39,6 +39,8 @@ The metrics-only process created spans for every signal even without a trace exp
 
 The repair normalizes keys to Python strings, disables span recording when no OTLP endpoint is configured, and skips formatting values for nonrecording spans. Two runtime files were backed up and deployed at 16:16:36 UTC. The warning flood ended, while the Prometheus endpoint continued returning HTTP 200 with populated metrics. No dependency upgrade or trace-export configuration change was required.
 
+A follow-up at 16:30:29 UTC made package exports lazy and assigned shutdown cleanup to the application lifespan, removing the module pre-import warning and duplicate cleanup path. The replacement process started cleanly and continued serving metrics. Source: [observability PR #27](https://github.com/victron-venus/venus-os-observability/pull/27).
+
 ### Log-forwarder lost its cursor at batch boundaries
 
 After reading 100 lines with TextIO iteration, the forwarder called `tell()` before EOF. CPython raises `OSError: telling position disabled by next() call` in this case, preventing reliable cursor advancement.
@@ -63,11 +65,26 @@ The audit prepares repository patches separately from the targeted live repairs.
 - The controller's duplicate DEBUG file was approximately 565 MiB. Source changes disable it by default, bound an explicitly requested duplicate file, and send watchdog logs through multilog. The existing large file was retained, and these controller runtime changes were not part of the telemetry hotfix.
 - Native observability/MCP/template installers and support documentation are reviewed against actual Venus service management and rootfs persistence. The [installation guide](INSTALL.md) replaces nonexistent bootstrap commands and incorrect systemd/status instructions.
 
+### Reviewable repository changes
+
+- [inverter-control #198](https://github.com/victron-venus/inverter-control/pull/198): transport, forwarder, bounded logging and installer recovery. After rebasing on 1.23.1, 594 tests passed with 87.05% coverage. Ruff, ShellCheck, formatting and secret checks passed. The configured Pylint hook retains warnings reproduced on the unchanged base, including a Python 3.14 standard-library inference issue; the new transport test file passes all hooks.
+- [dbus-mqtt-battery #64](https://github.com/victron-venus/dbus-mqtt-battery/pull/64): low-SoC warning throttling and chain installation; 116 tests.
+- [dbus-virtual-battery #41](https://github.com/victron-venus/dbus-virtual-battery/pull/41): required-source validity and native installation; 57 tests.
+- [dbus-tasmota-pv #73](https://github.com/victron-venus/dbus-tasmota-pv/pull/73): GLib publication, stale values and installation; 41 tests.
+- [dbus-esphome-grid-sensor #19](https://github.com/victron-venus/dbus-esphome-grid-sensor/pull/19): native D-Bus registration, freshness and installation; 45 tests and a container build. This does not establish physical CT calibration or direction.
+- [dbus-ev #22](https://github.com/victron-venus/dbus-ev/pull/22), [dbus-evcharger #26](https://github.com/victron-venus/dbus-evcharger/pull/26), [dbus-pump #27](https://github.com/victron-venus/dbus-pump/pull/27), and [dbus-emporia-vue #28](https://github.com/victron-venus/dbus-emporia-vue/pull/28): respectively 73, 70, 44 and 69 tests after reconciliation with current upstream.
+- [venus-os-observability #27](https://github.com/victron-venus/venus-os-observability/pull/27), [mcp-venus-os #47](https://github.com/4alvit/mcp-venus-os/pull/47), and [dbus-service-template #14](https://github.com/4alvit/dbus-service-template/pull/14): native runtime and installer corrections. Template validation includes rendering and executing generated tests.
+- [dbus-event-log #51](https://github.com/victron-venus/dbus-event-log/pull/51), [venus-os-integration-patterns #21](https://github.com/victron-venus/venus-os-integration-patterns/pull/21), and [venus-os-ci-toolkit #31](https://github.com/victron-venus/venus-os-ci-toolkit/pull/31): retention, deployment boundaries and target-runtime validation.
+
+These changes remain drafts and were not automatically merged or released. Test counts describe the audited local heads; CI and subsequent PR updates should be checked at the linked current heads. Docker integration tests for MCP were not executed because the local Docker daemon was unavailable. The governance repository is archived: its signed documentation correction remains local because GitHub rejected the push; the audit did not unarchive the repository.
+
 ## Resource observations and remaining work
 
 At 16:23:06 UTC, a 30.63-second `/proc` sample measured 48.75% aggregate host CPU busy, load averages 3.47/3.15/3.61 and 363060 KiB available memory (about 355 MiB). Top measured processes included inverter-control at 27.46% of one CPU core with 28.8 MiB RSS, dbus-daemon at 23.11% of one core, and observability at 5.16% of one core with 27.0 MiB RSS. Aggregate CPU and per-process one-core percentages use different denominators.
 
 These are a short post-repair sample, not a capacity guarantee or a controlled before/after benchmark. The initial top snapshot showed substantially higher busy time and VRM crash churn, but sampling methods and the concurrent controller rollout differ.
+
+A fresh 31.07-second sample at 16:38:09 UTC measured 49.62% aggregate CPU busy and load averages 4.76/3.55/3.42. The one-minute load therefore still spikes; a sustained load reduction is not established. A subsequent thread-state inspection ending at 16:40:01 UTC measured 0.05% iowait and observed only one blocked-thread sample, with up to seven runnable threads. That more intrusive diagnostic itself adds CPU overhead. These samples do not indicate a persistent storage wait bottleneck, but do show runnable-task contention on the four-core host.
 
 Outstanding checks:
 
