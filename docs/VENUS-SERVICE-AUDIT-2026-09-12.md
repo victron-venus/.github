@@ -41,6 +41,8 @@ The repair normalizes keys to Python strings, disables span recording when no OT
 
 A follow-up at 16:30:29 UTC made package exports lazy and assigned shutdown cleanup to the application lifespan, removing the module pre-import warning and duplicate cleanup path. The replacement process started cleanly and continued serving metrics. Source: [observability PR #27](https://github.com/victron-venus/venus-os-observability/pull/27).
 
+Later log inspection exposed another failure during meter disappearance: `float(dbus.Array([]))` raised an exception and discarded the rest of an ItemsChanged batch. A two-file repair completed at 16:46:09 UTC after live-file hash verification, backup and a smoke test using the installed interpreter and real dbus-python types. Explicit invalid or nonfinite numeric values now publish NaN in both metric backends, valid zero stays zero, and display-text-only updates do not overwrite measurements. All 94 local tests, strict type checks and configured hooks passed. The metrics endpoint recovered with HTTP 200; the next log check showed clean shutdown/startup and no new conversion error. This is not a claim that all silent source outages are independently detected.
+
 ### Log-forwarder lost its cursor at batch boundaries
 
 After reading 100 lines with TextIO iteration, the forwarder called `tell()` before EOF. CPython raises `OSError: telling position disabled by next() call` in this case, preventing reliable cursor advancement.
@@ -76,6 +78,8 @@ The audit prepares repository patches separately from the targeted live repairs.
 - [venus-os-observability #27](https://github.com/victron-venus/venus-os-observability/pull/27), [mcp-venus-os #47](https://github.com/4alvit/mcp-venus-os/pull/47), and [dbus-service-template #14](https://github.com/4alvit/dbus-service-template/pull/14): native runtime and installer corrections. Template validation includes rendering and executing generated tests.
 - [dbus-event-log #51](https://github.com/victron-venus/dbus-event-log/pull/51), [venus-os-integration-patterns #21](https://github.com/victron-venus/venus-os-integration-patterns/pull/21), and [venus-os-ci-toolkit #31](https://github.com/victron-venus/venus-os-ci-toolkit/pull/31): retention, deployment boundaries and target-runtime validation.
 
+The event-log follow-up implements a 30-day age ceiling, four retained archives, 100 MiB rotation checks before each insert/batch, and scheduled maintenance. Rotation checkpoints and closes WAL, prepares the replacement schema before moving the active file, and restores the original file if replacement fails. Tests cover collisions, busy WAL, rollback, ownership boundaries and unrelated files: 109 passed, 93.72% coverage, with lint/type/package and extracted-source-distribution checks passing. One batch can exceed the rotation threshold; this is not a hard filesystem quota or a minimum history guarantee. No event-log process was installed on the audited device.
+
 These changes remain drafts and were not automatically merged or released. Test counts describe the audited local heads; CI and subsequent PR updates should be checked at the linked current heads. Docker integration tests for MCP were not executed because the local Docker daemon was unavailable. The governance repository is archived: its signed documentation correction remains local because GitHub rejected the push; the audit did not unarchive the repository.
 
 ## Resource observations and remaining work
@@ -85,6 +89,8 @@ At 16:23:06 UTC, a 30.63-second `/proc` sample measured 48.75% aggregate host CP
 These are a short post-repair sample, not a capacity guarantee or a controlled before/after benchmark. The initial top snapshot showed substantially higher busy time and VRM crash churn, but sampling methods and the concurrent controller rollout differ.
 
 A fresh 31.07-second sample at 16:38:09 UTC measured 49.62% aggregate CPU busy and load averages 4.76/3.55/3.42. The one-minute load therefore still spikes; a sustained load reduction is not established. A subsequent thread-state inspection ending at 16:40:01 UTC measured 0.05% iowait and observed only one blocked-thread sample, with up to seven runnable threads. That more intrusive diagnostic itself adds CPU overhead. These samples do not indicate a persistent storage wait bottleneck, but do show runnable-task contention on the four-core host.
+
+At 16:47:11 UTC load averages were 2.59/2.63/2.98. VRM retained the same PID for 2005 seconds, the forwarder for 1832 seconds, and the most recently patched observability process was up for 67 seconds. The lower recent load is encouraging, but representative-day measurements remain outstanding.
 
 Outstanding checks:
 
