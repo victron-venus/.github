@@ -1,5 +1,10 @@
 # Venus OS service audit — 12 September 2026
 
+The subsequent [audit closure](VENUS-AUDIT-CLOSURE-2026-09-12.md) records the final
+freshness/reconnect fixes, additional releases and installation checks, the NAS
+alert-bridge update, and a passive meter capture with a naturally occurring
+hold-expiry/recovery event. The timestamps below describe earlier checkpoints.
+
 ## Published releases and coordinated rollout
 
 Following explicit user authorization, releases were published for fifteen projects.

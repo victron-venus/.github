@@ -148,6 +148,22 @@ The capacity must be numeric or invalid, never a numeric-looking string. In the 
 
 Check `/var/log` with `readlink -f /var/log`: on the audited device it points to `/data/log`, so logs write flash. Send normal logs to stdout/stderr through bounded `multilog`; avoid duplicate DEBUG files. Store frequently updated cursors and heartbeat files in `/run`.
 
+Check freshness independently from a successful connection. A slow HA request
+must not stop the GLib/D-Bus loop or its heartbeat. Timestamp a poll when
+acquisition starts and retain that timestamp through queued publication; a late
+callback is not a new measurement. MQTT fields with separate lifetimes must not
+renew one another. The charger bridge requires fresh valid status and power,
+checks its cache at most one second apart, and keeps blocking HA/grid acquisition
+at the configured poll interval. This avoids both expired MQTT publication and
+unintended extra HTTP requests.
+
+For the companion-host event-log Compose example, use the shipped
+single-underscore component environment names and its shared broker network.
+The mounted D-Bus socket belongs to the container host; this does not connect to
+a remote GX. SQLite retention and rotated container stdout are separate limits.
+Validate native BusItem signal coverage before commissioning a recorder.
+
 Reboot/firmware persistence must be validated in a planned maintenance window. A passing unit test or a successful `svc -u` does not prove restart health, measurement correctness, DVCC safety, or firmware-upgrade compatibility.
 
-See the [service audit and remaining checks](VENUS-SERVICE-AUDIT-2026-09-12.md).
+See the [service audit](VENUS-SERVICE-AUDIT-2026-09-12.md) and
+[closure evidence and validation limits](VENUS-AUDIT-CLOSURE-2026-09-12.md).
