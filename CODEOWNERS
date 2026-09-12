@@ -1,1 +1,4 @@
 * @4alvit
+
+# Workflow-only ownership for the independent automation reviewer.
+/.github/workflows/ @4alvit @californiantiramisu
