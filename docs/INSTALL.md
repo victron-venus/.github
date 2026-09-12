@@ -1,183 +1,153 @@
-# Full stack install guide
+# Installing services on Venus OS
 
-End-to-end setup for a Victron Venus home energy stack: **Cerbo GX + ESP32 BMS + Tasmota PV + control + dashboard**.
+Use each repository's released installer and configuration example. This organization contains independent repositories, not a monorepo with a shared `bootstrap.sh`.
 
-Architecture map: [architecture.md](./architecture.md).
+## Device prerequisites
 
-Created by [@4alvit](https://github.com/4alvit).
+Check the actual device before choosing packages:
 
-## Overview
-
-| Layer | Component | Install method |
-|-------|-----------|----------------|
-| Battery sensing | ESP32 + ESPHome | Flash firmware (separate from Cerbo) |
-| Battery on D-Bus | dbus-mqtt-battery | Venus PackageManager / `bootstrap.sh` |
-| PV metering | Tasmota plug + dbus-tasmota-pv | Flash Tasmota, then Venus package |
-| ESS control | inverter-control | Venus PackageManager / `bootstrap.sh` |
-| Live dashboard | inverter-dashboard-go | Cerbo binary or Venus package |
-| Optional Docker UI | inverter-dashboard | NAS Docker `alvit/inverter-dashboard` |
-| Optional desktop | inverter-desktop | Release installer |
-| Long-term metrics | inverter-monitoring | Docker on NAS |
-
-## Prerequisites
-
-- Victron Cerbo GX (or Raspberry Pi with Venus OS)
-- SSH access to Cerbo (`root@cerbo` or your hostname)
-- [kwindrem/SetupHelper](https://github.com/kwindrem/SetupHelper) on the Cerbo
-- MQTT enabled on Cerbo (or external broker reachable from all components)
-- Home Assistant is optional; inverter-control derives EV data from D-Bus (not HA) on recent versions
-
-## 1. Cerbo bootstrap (Venus packages)
-
-From a machine with SSH to the Cerbo and this monorepo checked out:
-
-```bash
-cd /path/to/victron
-./bootstrap.sh cerbo.local
+```sh
+ssh root@cerbo
+cat /opt/victronenergy/version
+python3 --version
+uname -m
+command -v svc svstat multilog
 ```
 
-This installs via SetupHelper:
+The September 2026 audit used Venus OS v3.75, Python 3.12.13 and a Raspberry Pi 3 Model B (ARMv7, approximately 1 GB RAM). This verifies that host, not every Cerbo GX hardware or firmware revision.
 
-- `inverter-control`
-- `dbus-mqtt-battery`
-- `dbus-tasmota-pv`
+Venus uses daemontools services under `/service`. Use `svstat` for status and `svc` for control. `systemctl`, `sv`, and `svcadm` are not native installation requirements. `/service` is volatile; retain application files, configuration and service templates under `/data` and recreate service links from `/data/rc.local` at boot. Put hooks before an existing `exit 0`. `/data/rc/S99*` alone is not a boot integration mechanism.
 
-Verify in Cerbo UI → Settings → Package Manager.
+Firmware replaces the root filesystem. Do not install Python dependencies globally or assume files copied to `/opt` survive an update. Use firmware-provided D-Bus/PyGObject libraries; if a package requires a venv, use its documented `/data` environment and check native-library availability after a firmware update. Never download or resolve dependencies from a boot hook. See [Victron's customization documentation](https://www.victronenergy.com/live/ccgx:root_access).
 
-Manual package list entries (also in `defaultPackageList.custom`):
+## Components
 
-```
-inverter-control        victron-venus    main
-dbus-mqtt-battery       victron-venus    main
-dbus-tasmota-pv         victron-venus    main
-```
+Native device services and their authoritative instructions:
 
-## 2. ESP32 JBD BMS (separate flash step)
+- [dbus-mqtt-battery](https://github.com/victron-venus/dbus-mqtt-battery): MQTT battery chains; configure each service instance and BMS topology.
+- [dbus-virtual-battery](https://github.com/victron-venus/dbus-virtual-battery): derived battery values; verify every required source and its availability.
+- [dbus-tasmota-pv](https://github.com/victron-venus/dbus-tasmota-pv): MQTT PV meters; configure the Tasmota topics and device mapping.
+- [dbus-emporia-vue](https://github.com/victron-venus/dbus-emporia-vue): Home Assistant measurements published as AC loads.
+- [dbus-ev](https://github.com/victron-venus/dbus-ev), [dbus-evcharger](https://github.com/victron-venus/dbus-evcharger), and [dbus-pump](https://github.com/victron-venus/dbus-pump): Home Assistant bridges. They depend on the configured HA endpoint and credentials.
+- [dbus-esphome-grid-sensor](https://github.com/victron-venus/dbus-esphome-grid-sensor): alternative MQTT grid bridge; not installed on the audited device.
+- [inverter-control](https://github.com/victron-venus/inverter-control): ESS controller. Configuration is Python `local_config.py`, optionally supplied through `/data/setupOptions/inverter-control/local_config.py`; it is not `config.yaml`.
+- [venus-os-observability](https://github.com/victron-venus/venus-os-observability): optional metrics agent. Use metrics-only operation on constrained devices unless trace export is specifically required and measured.
 
-ESPHome firmware is **not** installed through Venus PackageManager.
+SetupHelper integration is package-specific. Install [SetupHelper](https://github.com/kwindrem/SetupHelper) if the selected package requires it. Follow that package's `setup` invocation, release asset and dependency requirements; do not assume every project ships a native IPK or PackageManager package.
 
-1. Clone [esphome-jbd-bms-mqtt](https://github.com/victron-venus/esphome-jbd-bms-mqtt).
-2. Copy `secrets.yaml.example` → `secrets.yaml` and set WiFi + MQTT broker (Cerbo IP).
-3. Flash:
+Installers must preserve local configuration and venvs, stage an in-place update before replacing source files, and leave supervised service directories in place. Run installation checks before stopping a working service. For ESS controllers, use the repository's documented maintenance/keepalive procedure and verify a fresh heartbeat after starting.
 
-```bash
-esphome run jbd-bms-mqtt.yaml
-```
+Keep dashboards, Docker, Grafana, Loki, databases, forecasting and development tooling on a companion NAS/server by default. Install an on-device dashboard binary only after checking its architecture and measuring memory/CPU headroom. ESPHome firmware runs on the ESP32; desktop/mobile applications run on their respective clients. `mcp-venus-os` can run on a companion host over SSH. No governance or event-log service was running on the audited GX; verify actual integration before assuming controller writes are mediated or recorded by them.
 
-4. Confirm MQTT topics publish cell voltage / SOC to the Cerbo broker.
-5. Configure `dbus-mqtt-battery` on Cerbo to consume those topics (see dbus-mqtt-battery README).
+### SetupHelper version bookkeeping after a manual update
 
-## 3. Tasmota PV meter
+Calling a package's `update.sh` directly can bypass SetupHelper's `endScript`
+bookkeeping. The service may be updated successfully while
+`/etc/venus/installedVersion-<package>` is missing or still names an older
+release. Check the deployed source, runtime file hashes, preserved configuration,
+service state and package-specific health before repairing this metadata.
 
-1. Flash [Tasmota](https://tasmota.github.io/docs/) on a compatible energy meter plug.
-2. Set `SetOption19 1` (MQTT) and point broker to Cerbo.
-3. Install `dbus-tasmota-pv` on Cerbo (bootstrap or PackageManager).
-4. Configure device IP/hostname in dbus-tasmota-pv settings.
+Back up the existing marker, recording its absence if it does not exist. For a
+manually installed package whose installation has been verified, copy the exact
+bytes from its `version` file into a temporary file in `/etc/venus`, then rename
+that file atomically over the matching marker. For example, after completing
+those checks and the backup:
 
-## 4. inverter-control
-
-1. Edit `/data/inverter-control/config.yaml` (or use the repo template).
-2. Set Home Assistant URL/token and MQTT broker if not local.
-3. Restart: `svc -t /service/inverter-control`
-4. Confirm MQTT topic `inverter/state` publishes at ~4 s cadence.
-
-## 5. Dashboard
-
-### Go binary on Mac OS/Linux/Raspbery Pi
-
-```bash
-# On Raspberry Pi(ARM example — pick asset from releases)
-wget https://github.com/victron-venus/inverter-dashboard-go/releases/latest/download/inverter-dashboard-raspberry-pi3
-chmod +x inverter-dashboard-raspberry-pi3
-./inverter-dashboard-raspberry-pi3
-```
-
-Open `http://<cerbo-ip>:8080`.
-
-### Alternative: Docker on NAS
-
-```bash
-docker run -d --name inverter-dashboard \
-  -p 8080:8080 \
-  -e MQTT_HOST=<cerbo-ip> \
-  alvit/inverter-dashboard:latest
+```sh
+(
+    set -eu
+    package=inverter-control
+    package_version="/data/$package/version"
+    marker="/etc/venus/installedVersion-$package"
+    test -f "$package_version"
+    marker_tmp=$(mktemp "/etc/venus/.installedVersion-$package.XXXXXX")
+    trap 'rm -f "$marker_tmp"' EXIT
+    trap 'exit 1' HUP INT TERM
+    cp "$package_version" "$marker_tmp"
+    chmod 644 "$marker_tmp"
+    mv "$marker_tmp" "$marker"
+    cmp -s "$package_version" "$marker"
+)
 ```
 
-### Desktop client
+Do not rerun `setup` or `update.sh`, restart PackageManager, or restart the
+service solely to repair this marker. The marker does not implicitly register
+a package with PackageManager; a manually installed package can remain
+unregistered. Preserve existing registrations or their absence,
+`optionsSet`, `DO_NOT_AUTO_INSTALL` and existing auto-install/download settings.
+Updating the marker records a verified installation; it does not install or
+validate the runtime itself.
 
-Download from [inverter-desktop releases](https://github.com/victron-venus/inverter-desktop/releases) and set MQTT host to Cerbo.
+### Archived governance project
 
-Follow instructions [Installation](https://github.com/victron-venus/inverter-desktop#installation)
+[`venus-os-governance`](https://github.com/victron-venus/venus-os-governance) is
+archived. Its source is not a validated native SetupHelper package, and its
+direct D-Bus adapter remains unfinished. The adapter's Battery/DVCC/VE.Bus
+convenience interfaces must not be assumed to implement Venus BusItem
+`GetValue`/`SetValue` calls. A recorded policy decision does not demonstrate that
+the controller requested permission or that a physical device accepted a write.
+Keep this distinction when reading historical architecture diagrams.
 
-### android client
+Any future governance integration needs a tested caller contract and explicit
+write acknowledgement. Prefer companion-host MQTT integration on constrained
+GX systems; if a native package is developed, validate its persistent `/data`
+layout, offline dependencies, bounded logs and service lifecycle separately.
+The September audit's documentation correction is maintained here without
+reopening or deploying the archived repository.
 
-Download from [inverter-desktop releases](https://github.com/victron-venus/inverter-desktop/releases) and set MQTT host to Cerbo.
+## Release webhooks and retries
 
-Follow instructions [android Installation](https://github.com/victron-venus/inverter-desktop#android-installation)
+Check the existing release webhook and package auto-update settings before
+publishing a tag. A release can trigger installation independently of the
+interactive maintenance session.
 
-### iOS client
+The audited NAS controller webhook runs installation synchronously through one
+Gunicorn worker. During the 1.23.2 release, processing occupied the worker for
+about 20 seconds: GitHub recorded delivery timeouts, although device verification
+confirmed that installation completed. The subsequent `released` event was
+eventually ignored after waiting behind the `published` request.
 
-Download from [inverter-desktop releases](https://github.com/victron-venus/inverter-desktop/releases) and set MQTT host to Cerbo.
+Verify the installed version, shipped file hashes, service state and fresh
+controller heartbeat before redelivery, and confirm that no installer or
+maintenance helper is still active. A version file alone does not prove a
+complete install. The current controller webhook checks the version after
+installation and has no delivery-ID deduplication or asynchronous job queue;
+redelivery can repeat the update and restart services. Delivery status and
+device installation status must be assessed separately.
 
-Follow instructions [iOS Installation](https://github.com/victron-venus/inverter-desktop#ios-installation)
+## MQTT
 
-## 6. Monitoring stack (optional)
+Use the GX's existing broker or a documented external broker. Venus OS v3.75 on the audited device uses FlashMQ. Do not start another system D-Bus daemon or install a second broker as part of a bridge installer.
 
-On a NAS or server with Docker:
+Topic schemes differ. Native Venus telemetry uses `N/<portal-id>/<service>/<instance>/<path>`; native read requests use `R/<portal-id>/...`. Raw ESPHome/Tasmota battery topics and application `inverter/state` are separate contracts. Read the publisher's README and use the actual portal ID; `xxxxxxxxxxx` is a placeholder that generates rejected requests. A broad `victron/#` subscription does not validate these installations.
 
-```bash
-git clone https://github.com/victron-venus/inverter-monitoring.git
-cd inverter-monitoring
-# Edit telegraf.conf for your MQTT broker
-docker compose up -d
+## Verify installation and logs
+
+Use the actual supervised instance name, which can differ from the repository name:
+
+```sh
+svstat /service/dbus-mqtt-chain1 /service/dbus-mqtt-chain2
+svstat /service/dbus-virtual-chain /service/inverter-control
+svstat /service/dbus-ev /service/vrmlogger
+tail -n 80 /var/log/dbus-ev/current
+tail -n 80 /var/log/vrmlogger/current
 ```
 
-Grafana: import dashboards from `grafana/dashboards/`.
+`svc -s` suspends a service; it is not a status command. Never read `supervise/ok` with `cat`: it is a FIFO and can leave a blocked process. Use `svc -u` to start, `svc -d` to stop, or `svc -t` for a deliberate restart.
 
-## 7. Validation
+Verify values and types as well as process uptime:
 
-Run integration tests from a dev machine:
-
-```bash
-git clone https://github.com/victron-venus/integration-tests.git
-cd integration-tests
-docker compose up --abort-on-container-exit
+```sh
+dbus-send --system --print-reply --dest=com.victronenergy.ev.ha \
+  /BatteryCapacity com.victronenergy.BusItem.GetValue
+dbus-send --system --print-reply --dest=com.victronenergy.ev.ha \
+  /Connected com.victronenergy.BusItem.GetValue
 ```
 
-## 6b. EV charging (optional)
+The capacity must be numeric or invalid, never a numeric-looking string. In the audited system a string capacity crashed the stock VRM logger repeatedly. Also verify current values in the GX UI, a successful VRM upload, and fresh MQTT/HA inputs.
 
-`dbus-evcharger` and `dbus-ev` source EV data from the Cerbo's own MQTT broker —
-not Home Assistant — so the telemetry chain survives HA restarts. Install via
-PackageManager or `bootstrap.sh`.
+Check `/var/log` with `readlink -f /var/log`: on the audited device it points to `/data/log`, so logs write flash. Send normal logs to stdout/stderr through bounded `multilog`; avoid duplicate DEBUG files. Store frequently updated cursors and heartbeat files in `/run`.
 
-```
-dbus-evcharger      victron-venus    main
-dbus-ev             victron-venus    main
-```
+Reboot/firmware persistence must be validated in a planned maintenance window. A passing unit test or a successful `svc -u` does not prove restart health, measurement correctness, DVCC safety, or firmware-upgrade compatibility.
 
-Verify: `mosquitto_sub -h <cerbo> -t 'victron/charger/#' -v` shows live state.
-
-## 6c. Water tank / pump (optional)
-
-`dbus-pump` exposes a water tank level and pump control on D-Bus so Venus OS
-shows it like a built-in sensor.
-
-```
-dbus-pump           victron-venus    main
-```
-
-## Troubleshooting
-
-| Symptom | Check |
-|---------|--------|
-| No battery on VRM | ESP32 MQTT + dbus-mqtt-battery logs (`logread -f`) |
-| No PV on D-Bus | Tasmota MQTT + dbus-tasmota-pv HTTP reachability |
-| Dashboard empty | `mosquitto_sub -h <cerbo> -t 'inverter/state' -v` |
-| Control not adjusting | inverter-control D-Bus permissions, governance gates |
-| EV not appearing | `mosquitto_sub -h <cerbo> -t 'N/<id>/evcharger/#'` — confirm broker reachability |
-
-## Related docs
-
-- [Organization profile](../profile/README.md)
-- [CONTRIBUTING.md](../CONTRIBUTING.md)
-- Per-repo README files for configuration detail
+See the [service audit and remaining checks](VENUS-SERVICE-AUDIT-2026-09-12.md).

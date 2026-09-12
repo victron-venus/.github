@@ -47,64 +47,34 @@
 
 <article class="prose">
 <p class="eyebrow">01 · Install</p>
-<h1 style="font-family:var(--font-display);font-size:clamp(1.7rem,2.5vw+0.5rem,2.4rem);margin-top:0.75rem">Full stack install guide</h1>
-<p style="margin-top:0.75rem">Each layer installs independently. Start with what solves a real problem
-today — most people begin with battery sensing or the dashboard, not everything at once.</p>
-
-<h2>Prerequisites</h2>
+<h1>Installing on Venus OS</h1>
+<p>Use the selected repository's released installer and configuration example. These projects are independent repositories; there is no organization-wide <code>bootstrap.sh</code>.</p>
+<h2>Check the device first</h2>
+<pre><code>cat /opt/victronenergy/version
+python3 --version
+uname -m
+command -v svc svstat multilog</code></pre>
+<p>The September 2026 audit used Venus OS v3.75 and Python 3.12.13 on a Raspberry Pi 3 Model B with approximately 1 GB RAM. Other hardware and firmware need their own checks.</p>
+<h2>Native service installation</h2>
+<p>Use daemontools: persistent application and service files under <code>/data</code>, symlinks under volatile <code>/service</code>, and offline boot restoration from <code>/data/rc.local</code> before any <code>exit 0</code>. A systemd unit or an unreferenced <code>/data/rc/S99*</code> file will not install a native Venus service.</p>
+<p>Install SetupHelper when the package requires it. Preserve local configuration and venvs during updates. Check dependencies before stopping the existing service; do not run global pip upgrades or network installers at boot.</p>
 <ul>
-  <li>A Cerbo GX or other Venus OS device with network access and SSH enabled.</li>
-  <li>An MQTT broker reachable from both the GX and wherever dashboards run (Mosquitto works).</li>
-  <li>For battery sensing: an ESP32 and a JBD BMS battery within Bluetooth range.</li>
+<li>Battery and PV bridges: follow <a href="https://github.com/victron-venus/dbus-mqtt-battery">dbus-mqtt-battery</a>, <a href="https://github.com/victron-venus/dbus-virtual-battery">dbus-virtual-battery</a>, and <a href="https://github.com/victron-venus/dbus-tasmota-pv">dbus-tasmota-pv</a>.</li>
+<li>Home Assistant bridges: <a href="https://github.com/victron-venus/dbus-emporia-vue">Emporia</a>, <a href="https://github.com/victron-venus/dbus-ev">EV</a>, <a href="https://github.com/victron-venus/dbus-evcharger">EV charger</a>, and <a href="https://github.com/victron-venus/dbus-pump">pump</a> depend on their configured HA endpoint.</li>
+<li><a href="https://github.com/victron-venus/inverter-control">inverter-control</a> uses <code>local_config.py</code>, with a preserved copy under <code>/data/setupOptions/inverter-control/</code>. Verify metering before enabling control.</li>
+<li><a href="https://github.com/victron-venus/venus-os-observability">Observability</a>: use metrics-only mode when trace export is unnecessary.</li>
 </ul>
-
-<h2>Components by layer</h2>
-<div class="table-scroll">
-<table>
-  <thead><tr><th>Layer</th><th>Component</th><th>Install method</th></tr></thead>
-  <tbody>
-    <tr><td>Battery sensing</td><td>ESP32 + ESPHome</td><td>Flash firmware to the ESP32 (separate from the Cerbo)</td></tr>
-    <tr><td>Battery on D-Bus</td><td>dbus-mqtt-battery</td><td>Venus PackageManager or <code>bootstrap.sh</code></td></tr>
-    <tr><td>PV metering</td><td>Tasmota plug + dbus-tasmota-pv</td><td>Flash Tasmota, then install the Venus package</td></tr>
-    <tr><td>Grid metering</td><td>dbus-esphome-grid-sensor</td><td>Flash ESP32, install the Venus package</td></tr>
-    <tr><td>ESS control</td><td>inverter-control</td><td>Venus PackageManager or <code>bootstrap.sh</code></td></tr>
-    <tr><td>Live dashboard</td><td>inverter-dashboard-go</td><td>Cerbo binary or Venus package</td></tr>
-    <tr><td>Docker UI (optional)</td><td>inverter-dashboard</td><td>Docker on NAS: <code>alvit/inverter-dashboard</code></td></tr>
-    <tr><td>Desktop client (optional)</td><td>inverter-desktop</td><td>Release installer per platform</td></tr>
-    <tr><td>Long-term metrics</td><td>inverter-monitoring</td><td>Docker on NAS (Telegraf + InfluxDB + Grafana)</td></tr>
-    <tr><td>EV charging</td><td>dbus-evcharger + dbus-ev</td><td>Venus PackageManager or <code>bootstrap.sh</code></td></tr>
-    <tr><td>Water tank/pump</td><td>dbus-pump</td><td>Venus PackageManager or <code>bootstrap.sh</code></td></tr>
-  </tbody>
-</table>
-</div>
-
-<h2>Recommended order</h2>
-<ol class="step-list">
-  <li><strong>Broker up first.</strong> Install Mosquitto somewhere always-on. Every component assumes it can reach the broker.</li>
-  <li><strong>Sense.</strong> Flash the ESP32 BLE proxy (<a href="https://github.com/victron-venus/esphome-jbd-bms-mqtt">esphome-jbd-bms-mqtt</a>) and verify BMS data lands in MQTT.</li>
-  <li><strong>Publish to D-Bus.</strong> Install <a href="https://github.com/victron-venus/dbus-mqtt-battery">dbus-mqtt-battery</a> on the GX. The battery appears in the Venus UI immediately.</li>
-  <li><strong>Add PV/grid metering</strong> if you have Tasmota plugs or a CT sensor — same pattern.</li>
-  <li><strong>Dashboard.</strong> Drop <a href="https://github.com/victron-venus/inverter-dashboard-go">inverter-dashboard-go</a> onto the Cerbo; open its port from any browser.</li>
-  <li><strong>Control last.</strong> Only after metering is trustworthy, install <a href="https://github.com/victron-venus/inverter-control">inverter-control</a>. Test grid-zero behavior with conservative limits first. EV charging setpoints follow the same governed write path.</li>
-  <li><strong>Then the extras:</strong> long-term metrics, desktop client, forecasting, observability.</li>
-</ol>
-
-<h2>Verifying each step</h2>
-<p>After every layer, check before moving on:</p>
-<pre><code># On the Cerbo — does the service run?
-svc -s /service/dbus-mqtt-battery
-
-# On anything — did data reach MQTT?
-mosquitto_sub -t 'victron/#' -v</code></pre>
-<p>If <code>victron/#</code> shows values but the Venus remote console doesn't show the device,
-check the D-Bus service name against the <a href="integration.html">integration reference</a>.</p>
-
-<div class="callout">
-  <strong>Uninstalling is safe.</strong> Every D-Bus service removes cleanly via PackageManager or by
-  deleting its <code>/opt/victronenergy/service-name</code> directory and restarting — no persistent
-  state outside its own log directory.
-</div>
-
+<h2>Keep companion workloads off the GX</h2>
+<p>Run Docker dashboards, Grafana/Loki, databases and forecasting on a NAS/server. Flash ESPHome on the ESP32. Check architecture and resource headroom before adding optional dashboard binaries to a GX. Not every repository is a deployable native package.</p>
+<h2>Verify uptime, logs and D-Bus types</h2>
+<pre><code>svstat /service/dbus-mqtt-chain1 /service/dbus-mqtt-chain2
+svstat /service/dbus-ev /service/vrmlogger
+tail -n 80 /var/log/dbus-ev/current
+tail -n 80 /var/log/vrmlogger/current</code></pre>
+<p><code>svc -s</code> suspends a process; it does not show status. Never <code>cat supervise/ok</code>, which is a FIFO. Repository names and supervised instance names can differ.</p>
+<p>Verify numeric D-Bus values, <code>/Connected</code>, fresh source data and successful VRM uploads. Native MQTT topics use <code>N/&lt;portal-id&gt;/...</code>; raw sensor and application topics have their own contracts. Use the actual portal ID and the existing GX broker.</p>
+<p>On the audited device <code>/var/log</code> points to persistent <code>/data/log</code>. Bound logs with multilog and keep frequent cursors/heartbeats under <code>/run</code>. Test reboot and firmware recovery during a planned maintenance window.</p>
+<p>Read the <a href="https://github.com/victron-venus/.github/blob/main/docs/INSTALL.md">complete installation guide</a> and <a href="https://github.com/victron-venus/.github/blob/main/docs/VENUS-SERVICE-AUDIT-2026-09-12.md">service audit</a>.</p>
 </article>
 </div>
 </main>

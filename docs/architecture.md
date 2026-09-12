@@ -14,9 +14,10 @@ flowchart TB
         direction TB
         ESP["ESP32 + ESPHome"]
         TAS["Tasmota energy meter"]
-        EVCHG["EV charger OCPP"]
+        EVCHG["EV charger"]
         PUMP["Water tank / pump"]
         BMS["JBD BMS / LiFePO4"]
+        ESPH["esphome-jbd-bms-mqtt firmware"]
     end
 
     subgraph Pkgs["Venus OS packages"]
@@ -28,9 +29,8 @@ flowchart TB
         EV["dbus-evcharger / dbus-ev"]
         PMP["dbus-pump"]
         IC["inverter-control"]
-        EL["dbus-event-log"]
+        EL["dbus-event-log (optional)"]
         OBS["venus-os-observability"]
-        ESPH["esphome-jbd-bms-mqtt"]
     end
 
     Field -->|"sensors / MQTT / HTTP"| Pkgs
@@ -40,15 +40,18 @@ flowchart TB
     ESP -.-> ESPH
     ESPH -.-> BM
     TAS -.-> PV
-    EVCHG -.-> EV
-    PUMP -.-> PMP
+    EVCHG -.-> HA["Home Assistant"]
+    PUMP -.-> HA
+    HA -.-> EV
+    HA -.-> PMP
+    HA -.-> EMP
 
     style CERBO fill:#e67e22,color:#fff
     style IC fill:#4ecdc4,color:#000
     style OBS fill:#8e44ad,color:#fff
 ```
 
-Protocols in short: ESP/BMS → MQTT → `dbus-mqtt-battery`; Tasmota HTTP → `dbus-tasmota-pv`; EV/pump MQTT → `dbus-evcharger` / `dbus-pump`; packages expose D-Bus on Cerbo; `inverter-control` / `dbus-event-log` / `venus-os-observability` attach on D-Bus too.
+Audited protocols: ESP/BMS → MQTT → `dbus-mqtt-battery`; Tasmota MQTT → `dbus-tasmota-pv`; Home Assistant → `dbus-ev`, `dbus-evcharger`, `dbus-pump` and `dbus-emporia-vue`. These packages publish D-Bus values consumed by the controller and native Venus services. `venus-os-observability` reads D-Bus for metrics. This is a repository map: the optional event-log and ESPHome grid bridge were not installed on the audited GX, and the archived governance project does not mediate its controller writes.
 
 ## 2. MQTT → dashboards & edge
 
