@@ -80,6 +80,16 @@ The audit prepares repository patches separately from the targeted live repairs.
 
 The event-log follow-up implements a 30-day age ceiling, four retained archives, 100 MiB rotation checks before each insert/batch, and scheduled maintenance. Rotation checkpoints and closes WAL, prepares the replacement schema before moving the active file, and restores the original file if replacement fails. Tests cover collisions, busy WAL, rollback, ownership boundaries and unrelated files: 109 passed, 93.72% coverage, with lint/type/package and extracted-source-distribution checks passing. One batch can exceed the rotation threshold; this is not a hard filesystem quota or a minimum history guarantee. No event-log process was installed on the audited device.
 
+### Grid measurement validity follow-up
+
+[inverter-control #199](https://github.com/victron-venus/inverter-control/pull/199) is a separate draft stacked on #198. Offline reproduction showed that an invalid grid value could leave the old power cached while unrelated battery traffic renewed a shared timestamp. Venus also replaces a missing external meter with native inverter measurements. On this site, that would replace a declared two-phase VM-3P75CT source with a one-phase VE.Bus source.
+
+The follow-up separates grid validity from general bus activity, pins source/device instance and topology, checks external meter metadata, and rejects replies that span an invalidation. Normal control pauses before calculation and rechecks validity before writing. Pending manual requests and established watchdog policy are preserved; stale filter history is discarded. Unchanged measurements remain valid through periodic authoritative reads, with a 40-second monotonic revalidation budget. Explicit invalidation pauses normal writes on the next control cycle; silent expiry must first exhaust the revalidation budget before the existing watchdog timeout and hysteresis complete.
+
+Default automatic discovery cannot identify an external meter that has never appeared in the current process. This site's rollout therefore needs explicit expected meter and two-phase settings after checking the healthy physical configuration. No such configuration or controller runtime change was deployed by the audit. The [operator guide](https://github.com/victron-venus/inverter-control/blob/fix/grid-telemetry-validity-20260912/docs/grid-telemetry-safety.md) documents cold-start limits, recovery timing and unsupported three-phase control.
+
+The final frozen suite passed 654 tests with 87.17% coverage, including 60 focused grid regressions. Independent review included 14 additional behavioral checks. Ruff/format checks passed; Bandit 1.8.3 under Python 3.12 found no medium/high findings and skipped no scanned files. Existing Pylint baseline findings remain documented. Because the follow-up targets a feature branch, CodeQL and Python Security workflows restricted to `main` must rerun after retargeting; their filters were not weakened.
+
 These changes remain drafts and were not automatically merged or released. Test counts describe the audited local heads; CI and subsequent PR updates should be checked at the linked current heads. Docker integration tests for MCP were not executed because the local Docker daemon was unavailable. The governance repository is archived: its signed documentation correction remains local because GitHub rejected the push; the audit did not unarchive the repository.
 
 ## Resource observations and remaining work
@@ -91,6 +101,14 @@ These are a short post-repair sample, not a capacity guarantee or a controlled b
 A fresh 31.07-second sample at 16:38:09 UTC measured 49.62% aggregate CPU busy and load averages 4.76/3.55/3.42. The one-minute load therefore still spikes; a sustained load reduction is not established. A subsequent thread-state inspection ending at 16:40:01 UTC measured 0.05% iowait and observed only one blocked-thread sample, with up to seven runnable threads. That more intrusive diagnostic itself adds CPU overhead. These samples do not indicate a persistent storage wait bottleneck, but do show runnable-task contention on the four-core host.
 
 At 16:47:11 UTC load averages were 2.59/2.63/2.98. VRM retained the same PID for 2005 seconds, the forwarder for 1832 seconds, and the most recently patched observability process was up for 67 seconds. The lower recent load is encouraging, but representative-day measurements remain outstanding.
+
+The final 31.00-second CPU sample ended at 16:52:23 UTC: 52.50% aggregate busy, load averages 2.71/2.78/2.97 and 344916 KiB available memory. Recent interval measurements therefore cluster around half of aggregate CPU capacity; they are not directly equivalent to the initial instantaneous top reading.
+
+### Meter transport follow-up
+
+Nine removals logged between 16:00 and 16:50 UTC cited configuration registers `0x2000–0x2023`; the meter reappeared three to nine seconds later. Inspection of the installed driver showed that removal requires more than five seconds without a successful full update. Its transaction timeout adapts to the greater of 100 ms and four times filtered transaction latency. The installed pymodbus client disables retries for empty/invalid replies; subsequent driver update calls provide additional attempts.
+
+The 16:50:20–31 UTC network snapshot routed meter traffic through wired Ethernet at 100 Mbps/full duplex. CRC/frame/missed-packet errors and collisions were zero, with no new UDP buffer/checksum errors or softnet drops. Generic interface receive drops increased by eight; cumulative UDP receive-buffer errors show historical software drops. These counters cover all traffic, so they neither identify meter packets nor establish a NIC fault. The next useful check is register-specific Modbus response timing during an actual failure, correlated with socket drops and switch-port error/discard/link counters. No protocol, timeout or network configuration was changed.
 
 Outstanding checks:
 
