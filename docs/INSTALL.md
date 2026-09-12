@@ -39,6 +39,23 @@ Installers must preserve local configuration and venvs, stage an in-place update
 
 Keep dashboards, Docker, Grafana, Loki, databases, forecasting and development tooling on a companion NAS/server by default. Install an on-device dashboard binary only after checking its architecture and measuring memory/CPU headroom. ESPHome firmware runs on the ESP32; desktop/mobile applications run on their respective clients. `mcp-venus-os` can run on a companion host over SSH. No governance or event-log service was running on the audited GX; verify actual integration before assuming controller writes are mediated or recorded by them.
 
+### Archived governance project
+
+[`venus-os-governance`](https://github.com/victron-venus/venus-os-governance) is
+archived. Its source is not a validated native SetupHelper package, and its
+direct D-Bus adapter remains unfinished. The adapter's Battery/DVCC/VE.Bus
+convenience interfaces must not be assumed to implement Venus BusItem
+`GetValue`/`SetValue` calls. A recorded policy decision does not demonstrate that
+the controller requested permission or that a physical device accepted a write.
+Keep this distinction when reading historical architecture diagrams.
+
+Any future governance integration needs a tested caller contract and explicit
+write acknowledgement. Prefer companion-host MQTT integration on constrained
+GX systems; if a native package is developed, validate its persistent `/data`
+layout, offline dependencies, bounded logs and service lifecycle separately.
+The September audit's documentation correction is maintained here without
+reopening or deploying the archived repository.
+
 ## MQTT
 
 Use the GX's existing broker or a documented external broker. Venus OS v3.75 on the audited device uses FlashMQ. Do not start another system D-Bus daemon or install a second broker as part of a bridge installer.
