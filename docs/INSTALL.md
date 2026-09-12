@@ -39,6 +39,45 @@ Installers must preserve local configuration and venvs, stage an in-place update
 
 Keep dashboards, Docker, Grafana, Loki, databases, forecasting and development tooling on a companion NAS/server by default. Install an on-device dashboard binary only after checking its architecture and measuring memory/CPU headroom. ESPHome firmware runs on the ESP32; desktop/mobile applications run on their respective clients. `mcp-venus-os` can run on a companion host over SSH. No governance or event-log service was running on the audited GX; verify actual integration before assuming controller writes are mediated or recorded by them.
 
+### SetupHelper version bookkeeping after a manual update
+
+Calling a package's `update.sh` directly can bypass SetupHelper's `endScript`
+bookkeeping. The service may be updated successfully while
+`/etc/venus/installedVersion-<package>` is missing or still names an older
+release. Check the deployed source, runtime file hashes, preserved configuration,
+service state and package-specific health before repairing this metadata.
+
+Back up the existing marker, recording its absence if it does not exist. For a
+manually installed package whose installation has been verified, copy the exact
+bytes from its `version` file into a temporary file in `/etc/venus`, then rename
+that file atomically over the matching marker. For example, after completing
+those checks and the backup:
+
+```sh
+(
+    set -eu
+    package=inverter-control
+    package_version="/data/$package/version"
+    marker="/etc/venus/installedVersion-$package"
+    test -f "$package_version"
+    marker_tmp=$(mktemp "/etc/venus/.installedVersion-$package.XXXXXX")
+    trap 'rm -f "$marker_tmp"' EXIT
+    trap 'exit 1' HUP INT TERM
+    cp "$package_version" "$marker_tmp"
+    chmod 644 "$marker_tmp"
+    mv "$marker_tmp" "$marker"
+    cmp -s "$package_version" "$marker"
+)
+```
+
+Do not rerun `setup` or `update.sh`, restart PackageManager, or restart the
+service solely to repair this marker. The marker does not implicitly register
+a package with PackageManager; a manually installed package can remain
+unregistered. Preserve existing registrations or their absence,
+`optionsSet`, `DO_NOT_AUTO_INSTALL` and existing auto-install/download settings.
+Updating the marker records a verified installation; it does not install or
+validate the runtime itself.
+
 ### Archived governance project
 
 [`venus-os-governance`](https://github.com/victron-venus/venus-os-governance) is
