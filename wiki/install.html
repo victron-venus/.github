@@ -74,6 +74,8 @@ tail -n 80 /var/log/vrmlogger/current</code></pre>
 <p><code>svc -s</code> suspends a process; it does not show status. Never <code>cat supervise/ok</code>, which is a FIFO. Repository names and supervised instance names can differ.</p>
 <p>Verify numeric D-Bus values, <code>/Connected</code>, fresh source data and successful VRM uploads. Native MQTT topics use <code>N/&lt;portal-id&gt;/...</code>; raw sensor and application topics have their own contracts. Use the actual portal ID and the existing GX broker.</p>
 <p>On the audited device <code>/var/log</code> points to persistent <code>/data/log</code>. Bound logs with multilog and keep frequent cursors/heartbeats under <code>/run</code>. Test reboot and firmware recovery during a planned maintenance window.</p>
+<p>A connected broker or successful HTTP response does not prove fresh telemetry. Keep blocking requests outside the D-Bus main loop, preserve acquisition timestamps through queued callbacks, and expire MQTT fields independently. Freshness checks and network polling can have different intervals.</p>
+<p>The <a href="https://github.com/victron-venus/.github/blob/main/docs/VENUS-AUDIT-CLOSURE-2026-09-12.md">September audit closure</a> records the additional releases, device checks, passive meter capture and remaining physical validation limits.</p>
 <p>Read the <a href="https://github.com/victron-venus/.github/blob/main/docs/INSTALL.md">complete installation guide</a> and <a href="https://github.com/victron-venus/.github/blob/main/docs/VENUS-SERVICE-AUDIT-2026-09-12.md">service audit</a>.</p>
 </article>
 </div>
