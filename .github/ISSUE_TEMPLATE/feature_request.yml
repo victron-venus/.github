@@ -60,7 +60,7 @@ body:
     attributes:
       label: Alternative Solutions
       description: Other approaches you've considered (workarounds, existing tools)
-      placeholder: Workaround: manually edit config... Considered: external tool X...
+      placeholder: 'Workaround: manually edit config... Considered: external tool X...'
     validations:
       required: false
   - type: dropdown
