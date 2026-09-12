@@ -5,6 +5,7 @@ name: 'Security Scan'
 # is a static site, so only the JavaScript analysis runs.
 
 on:
+  workflow_call: {}
   push:
     branches: [main]
   pull_request:
