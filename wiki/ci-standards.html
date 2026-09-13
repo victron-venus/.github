@@ -77,8 +77,9 @@ call reusable workflows — no per-repo copies of lint/test logic to drift apart
   <li><strong>Harden runners.</strong> Workflows include
   <code>step-security/harden-runner</code> to audit egress network calls.</li>
   <li><strong>Never push to main.</strong> Feature branch from <code>main</code>, open a PR, let CI
-  and CodeQL pass, merge via review. Dependabot/Renovate PRs get the <code>auto-merge</code> label
-  instead of a human approval.</li>
+  and CodeQL pass, merge via review. Eligible, non-draft PRs receive auto-approval independently
+  of labels. The <code>automerge</code> label enables automatic merging after required checks
+  and review requirements are satisfied.</li>
   <li><strong>Conventional Commits.</strong> <code>feat:</code>, <code>fix:</code>,
   <code>docs:</code>, <code>chore:</code> — release tooling parses them.</li>
   <li><strong>Auto-approve hygiene.</strong> The reusable auto-approve workflow dismisses its own stale approval before re-approving, and the retry window is 30 minutes (not 15s).</li>
