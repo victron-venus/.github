@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         Use this for **usage questions**, **configuration help**, or **clarification**.
-        
+
         For bugs → use **Bug Report**. For features → use **Feature Request**.
   - type: dropdown
     id: repo
