@@ -82,24 +82,30 @@ their own integration contracts. The repository map is not a live deployment inv
   </div>
 </div>
 
+<h2 id="inverter-climate">Thermostat integration</h2>
+<p><a href="https://github.com/victron-venus/inverter-climate">inverter-climate</a> spans the D-Bus and control layers. A native supervised service on Venus OS reads local system energy, publishes room temperature, and exchanges thermostat state and commands with Home Assistant. HA owns the existing Google Nest connection and authentication.</p>
+<p>The stock <strong>GUI v2 Switch pane</strong> and <strong>VRM Remote Console</strong> can show its optional temperature slider and Heat/Off selector through the Switchable Output API on the same temperature device. Observation is the default; manual controls and automatic preheating are enabled separately. HA requests run outside the D-Bus loop and the separate ESS controller.</p>
+<p>The native path needs no companion gateway or GUI patch, while Nest still relies on HA and its cloud integration. For a gas furnace, the configured heating-power estimate describes electrical demand; it does not measure heat or gas and is not published as another AC load. See the <a href="install.html#inverter-climate">installation and control guide</a>.</p>
+
 <h2>Why two buses instead of one</h2>
-<p>D-Bus is how Venus OS itself models the world — battery, PV inverter, grid meter all appear as
-<code>com.victronenergy.*</code> services, so the built-in ESS logic treats third-party hardware as
-first-class. That's non-negotiable for control.</p>
-<p>But D-Bus is local-only. Dashboards on a laptop, Home Assistant, Grafana, and forecasters live
-elsewhere — they subscribe to MQTT mirrors of the same state. The split keeps safety-critical paths
-on the bus the OS controls, and convenience paths on the protocol every tool already has a client for.</p>
+<p>D-Bus is how Venus OS models batteries, PV inverters and grid meters as
+<code>com.victronenergy.*</code> services. The ESS controller reads and writes that local bus.</p>
+<p>Companion dashboards, Home Assistant, Grafana and forecasters use MQTT, HTTP or
+WebSockets according to their integration contracts. Thermostat commands from
+inverter-climate reach Home Assistant over its REST API, while the GX-facing
+temperature device and GUI controls use D-Bus. Validate freshness and command
+acknowledgements at each boundary.</p>
 
 <h2>Control path vs telemetry path</h2>
 <div class="table-scroll">
 <table>
   <thead><tr><th></th><th>Control path (amber)</th><th>Telemetry path (cyan)</th></tr></thead>
   <tbody>
-    <tr><td>Protocol</td><td>D-Bus on-device</td><td>MQTT / REST / WebSocket</td></tr>
+    <tr><td>Protocol</td><td>D-Bus for ESS; HA REST for thermostats</td><td>MQTT / REST / WebSocket</td></tr>
     <tr><td>Writers</td><td>Configured controller and native Venus services</td><td>Per-service publishers and gateways</td></tr>
     <tr><td>Audit</td><td>Verify actual logging; event-log is an optional integration</td><td>Configured metrics and logs</td></tr>
-    <tr><td>Timing</td><td>Control cadence plus D-Bus latency</td><td>Source-specific freshness limits</td></tr>
-    <tr><td>Failure mode</td><td>Configured validity, hold and watchdog policy</td><td>Mark unavailable inputs; stale telemetry can affect control</td></tr>
+    <tr><td>Timing</td><td>ESS cadence and D-Bus latency; HA/cloud latency and observed confirmation for thermostats</td><td>Source-specific freshness limits</td></tr>
+    <tr><td>Failure mode</td><td>ESS validity, hold and watchdog policy; thermostat availability and journaled uncertain outcomes</td><td>Mark unavailable inputs; stale telemetry can affect control</td></tr>
   </tbody>
 </table>
 </div>

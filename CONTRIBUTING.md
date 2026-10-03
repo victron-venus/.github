@@ -7,6 +7,7 @@ Thank you for contributing to the [victron-venus](https://github.com/victron-ven
 Each repository owns its code, issues, and releases. Pick the repo that matches your change:
 
 - **Control logic** → [inverter-control](https://github.com/victron-venus/inverter-control)
+- **Thermostats and climate coordination** → [inverter-climate](https://github.com/victron-venus/inverter-climate)
 - **Battery bridge** → [dbus-mqtt-battery](https://github.com/victron-venus/dbus-mqtt-battery)
 - **PV / Tasmota** → [dbus-tasmota-pv](https://github.com/victron-venus/dbus-tasmota-pv)
 - **ESP32 firmware** → [esphome-jbd-bms-mqtt](https://github.com/victron-venus/esphome-jbd-bms-mqtt)
@@ -29,7 +30,7 @@ Each repository owns its code, issues, and releases. Pick the repo that matches 
 - **Python:** `pytest`, type hints where practical, no secrets in logs or HTML.
 - **Go:** `go test ./...`, `gofmt`, minimal dependencies.
 - **Rust / Tauri:** `cargo test`, `cargo clippy` clean on changed code.
-- **Security:** Dependabot PRs welcome; pin GitHub Actions to SHAs.
+- **Security:** Dependency updates use Renovate; pin GitHub Actions to SHAs.
 
 ## Releases
 

@@ -31,6 +31,7 @@ Native device services and their authoritative instructions:
 - [dbus-ev](https://github.com/victron-venus/dbus-ev), [dbus-evcharger](https://github.com/victron-venus/dbus-evcharger), and [dbus-pump](https://github.com/victron-venus/dbus-pump): Home Assistant bridges. They depend on the configured HA endpoint and credentials.
 - [dbus-esphome-grid-sensor](https://github.com/victron-venus/dbus-esphome-grid-sensor): alternative MQTT grid bridge; not installed on the audited device.
 - [inverter-control](https://github.com/victron-venus/inverter-control): ESS controller. Configuration is Python `local_config.py`, optionally supplied through `/data/setupOptions/inverter-control/local_config.py`; it is not `config.yaml`.
+- [inverter-climate](https://github.com/victron-venus/inverter-climate): native thermostat integration via Home Assistant, with room-temperature telemetry, optional GUI v2 controls and separately enabled energy-aware preheating.
 - [venus-os-observability](https://github.com/victron-venus/venus-os-observability): optional metrics agent. Use metrics-only operation on constrained devices unless trace export is specifically required and measured.
 
 SetupHelper integration is package-specific. Install [SetupHelper](https://github.com/kwindrem/SetupHelper) if the selected package requires it. Follow that package's `setup` invocation, release asset and dependency requirements; do not assume every project ships a native IPK or PackageManager package.
@@ -38,6 +39,35 @@ SetupHelper integration is package-specific. Install [SetupHelper](https://githu
 Installers must preserve local configuration and venvs, stage an in-place update before replacing source files, and leave supervised service directories in place. Run installation checks before stopping a working service. For ESS controllers, use the repository's documented maintenance/keepalive procedure and verify a fresh heartbeat after starting.
 
 Keep dashboards, Docker, Grafana, Loki, databases, forecasting and development tooling on a companion NAS/server by default. Install an on-device dashboard binary only after checking its architecture and measuring memory/CPU headroom. ESPHome firmware runs on the ESP32; desktop/mobile applications run on their respective clients. `mcp-venus-os` can run on a companion host over SSH. No governance or event-log service was running on the audited GX; verify actual integration before assuming controller writes are mediated or recorded by them.
+
+### Inverter Climate: Home Assistant thermostat integration
+
+Add package **`inverter-climate`**, GitHub user **`victron-venus`**, branch
+**`latest`** to SetupHelper PackageManager. The branch contains the verified
+stable bundle and its locked Python HTTP dependencies. The development `main`
+branch is source code, not an installable package. The device must provide
+Python 3.12+, firmware D-Bus/GLib bindings and `velib_python`.
+
+A first installation stays disabled until configured and explicitly started.
+Follow the [native lifecycle guide](https://github.com/victron-venus/inverter-climate/blob/main/deploy/venus/README.md)
+and [Venus configuration example](https://github.com/victron-venus/inverter-climate/blob/main/examples/venus.toml).
+Keep `config.toml` and the `HA_BASE_URL` / `HA_TOKEN` environment file private under
+`/data/setupOptions/inverter-climate`. Select the actual HA climate entity, PV
+sources and grid phases, then verify fresh observations with `[service] mode = "observe"`.
+Home Assistant supplies the existing Nest connection and Google authentication.
+
+The device appears as **Inverter Climate**. **Settings → Devices** shows room
+temperature and metadata. To enable manual thermostat commands, set
+`control_enabled = true` in the existing `[device]` section and restart the service
+as described in the lifecycle guide. Open the **Switch pane** using the small
+icon at the upper left of GUI v2: **Temperature setpoint** is a slider, and
+**Heating mode** offers **Heat / Off**. These controls are also available through
+**VRM Remote Console**. Keep `mode = "observe"` for manual control without automatic
+preheating; `mode = "active"` separately enables the configured automatic policy.
+
+Updates preserve private configuration, device identity and command journals.
+An uncertain command is not automatically retried. Preserve its journal when
+investigating or rolling back; follow the package's recovery instructions.
 
 ### SetupHelper version bookkeeping after a manual update
 

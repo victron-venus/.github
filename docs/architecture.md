@@ -53,6 +53,35 @@ flowchart TB
 
 Audited protocols: ESP/BMS → MQTT → `dbus-mqtt-battery`; Tasmota MQTT → `dbus-tasmota-pv`; Home Assistant → `dbus-ev`, `dbus-evcharger`, `dbus-pump` and `dbus-emporia-vue`. These packages publish D-Bus values consumed by the controller and native Venus services. `venus-os-observability` reads D-Bus for metrics. This is a repository map: the optional event-log and ESPHome grid bridge were not installed on the audited GX, and the archived governance project does not mediate its controller writes.
 
+### Thermostat integration on Venus OS
+
+[inverter-climate](https://github.com/victron-venus/inverter-climate) runs as a
+native supervised Python service on the GX or a Raspberry Pi with Venus OS.
+It reads local system energy and publishes a room-temperature D-Bus device.
+Home Assistant supplies thermostat state and the existing Google Nest integration.
+
+```mermaid
+flowchart TB
+    ENERGY["Local system D-Bus energy"] --> CLIMATE["inverter-climate on Venus OS"]
+    GUI["GUI v2 Switch pane / VRM Remote Console"] -->|"Optional manual commands"| CLIMATE
+    CLIMATE -->|"Room temperature and observed settings"| GUI
+    CLIMATE <-->|"Thermostat state and commands"| HA["Home Assistant"]
+    HA <-->|"Existing Nest integration"| NEST["Google Nest thermostat"]
+```
+
+The temperature slider and Heat/Off selector use the stock Switchable Output API
+on the same temperature service. Observation is the default. Manual control and
+energy-aware automatic preheating are separate opt-ins; manual-only operation can
+retain `mode = "observe"`. HA requests run outside the D-Bus loop and the separate
+ESS controller. The native deployment needs no companion gateway or GUI patch,
+while Nest still depends on HA and its cloud integration.
+
+For a gas furnace, the configured electrical-load estimate describes its
+electrical demand while heating. It is not a heat or gas measurement and is not
+published as an additional AC load. See the
+[installation guide](INSTALL.md#inverter-climate-home-assistant-thermostat-integration)
+and the project's [D-Bus contract](https://github.com/victron-venus/inverter-climate/blob/main/docs/dbus-device.md).
+
 ## 2. MQTT → dashboards & edge
 
 ```mermaid

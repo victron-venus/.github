@@ -1,6 +1,6 @@
 # Victron Venus
 
-Open-source tools for **Victron Energy** systems on **Venus OS** — grid-zero control, battery/PV bridges, dashboards, and observability.
+Open-source tools for **Victron Energy** systems on **Venus OS** — grid-zero control, thermostat integration, battery/PV bridges, dashboards, and observability.
 
 Created by [@4alvit](https://github.com/4alvit).
 
@@ -44,6 +44,7 @@ flowchart LR
 | Repository | Role |
 |------------|------|
 | [inverter-control](https://github.com/victron-venus/inverter-control) | Grid-zero ESS external control (4 s cadence, EV from D-Bus) |
+| [inverter-climate](https://github.com/victron-venus/inverter-climate) | Native Venus OS thermostat integration via Home Assistant, with room temperature, optional GUI v2 Heat/Off and setpoint controls, and energy-aware preheating |
 | [dbus-mqtt-battery](https://github.com/victron-venus/dbus-mqtt-battery) | MQTT → D-Bus bridge for JBD BMS batteries (DVCC, reboot persistence) |
 | [dbus-tasmota-pv](https://github.com/victron-venus/dbus-tasmota-pv) | Tasmota power meter → D-Bus PV inverter (daemontools multilog) |
 | [dbus-emporia-vue](https://github.com/victron-venus/dbus-emporia-vue) | Emporia Vue submeters → D-Bus AC load (one per channel) |
@@ -56,6 +57,15 @@ flowchart LR
 | [dbus-service-template](https://github.com/4alvit/dbus-service-template) | Template renderer for new D-Bus services (generation-test in CI) |
 | [esphome-jbd-bms-mqtt](https://github.com/victron-venus/esphome-jbd-bms-mqtt) | ESP32 BLE proxy for JBD BMS → MQTT |
 | [esphome-ble-sensor-patterns](https://github.com/4alvit/esphome-ble-sensor-patterns) | Production-ready ESPHome BLE sensor configurations |
+
+**Thermostat control:** [inverter-climate](https://github.com/victron-venus/inverter-climate)
+runs on the GX or a Raspberry Pi with Venus OS. It reads local D-Bus energy data
+and uses the existing Home Assistant integration for Google Nest. Its optional
+temperature slider and Heat/Off selector appear in the **GUI v2 Switch pane**, also
+accessible through **VRM Remote Console**. Observation is the default; manual
+control and automatic preheating are enabled separately. Install through
+SetupHelper/PackageManager from the `latest` branch; see the
+[native installation guide](https://github.com/victron-venus/inverter-climate/blob/main/deploy/venus/README.md).
 
 ### Dashboards & UI
 

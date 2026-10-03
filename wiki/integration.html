@@ -58,9 +58,10 @@ validate service discovery, numeric path types, freshness and resource use again
 com.victronenergy.battery.jbd_mqtt        # dbus-mqtt-battery
 com.victronenergy.pvinverter.tasmota      # dbus-tasmota-pv
 com.victronenergy.grid.esphome_ct         # dbus-esphome-grid-sensor
-com.victronenergy.acload.emporia_vue_1    # dbus-emporia-vue, one per channel</code></pre>
+com.victronenergy.acload.emporia_vue_1    # dbus-emporia-vue, one per channel
+com.victronenergy.temperature.inverter_climate_&lt;identity&gt; # inverter-climate</code></pre>
 <p>Pick <code>&lt;type&gt;</code> from what Venus OS already understands — <code>battery</code>,
-<code>pvinverter</code>, <code>grid</code>, <code>acload</code>, <code>solarcharger</code>. A wrong
+<code>pvinverter</code>, <code>grid</code>, <code>acload</code>, <code>solarcharger</code>, <code>temperature</code>. A wrong
 type means the GX ignores your service no matter how correct the paths are.</p>
 
 <h2>Paths every service should publish</h2>
@@ -75,6 +76,10 @@ type means the GX ignores your service no matter how correct the paths are.</p>
   </tbody>
 </table>
 </div>
+
+<h2>Native thermostat controls</h2>
+<p><a href="https://github.com/victron-venus/inverter-climate">inverter-climate</a> publishes <code>/Temperature</code> in Celsius with <code>/TemperatureType = 3</code> (room). Its identity suffix is a stable hash, and its optional <code>/SwitchableOutput/0</code> temperature slider and <code>/SwitchableOutput/1</code> Heat/Off selector belong to the same device. GUI v2 and VRM Remote Console use those standard controls without a GUI patch.</p>
+<p>Manual commands are opt-in, validated against fresh HA capabilities and journaled before dispatch. The D-Bus thread only queues requests; HA I/O runs outside it. Readback reflects HA observations, and uncertain commands are not replayed after restart. See the <a href="https://github.com/victron-venus/inverter-climate/blob/main/docs/dbus-device.md">complete D-Bus contract</a> and <a href="install.html#inverter-climate">installation guide</a>.</p>
 
 <h2>MQTT contracts</h2>
 <p>Native Venus telemetry uses <code>N/&lt;portal-id&gt;/&lt;service&gt;/&lt;instance&gt;/&lt;path&gt;</code>; read requests use <code>R/&lt;portal-id&gt;/...</code>. Raw ESPHome/Tasmota sensor topics and application <code>inverter/state</code> use separate schemas. Use the publisher's README and a real portal ID. Do not assume a universal <code>victron/#</code> namespace.</p>

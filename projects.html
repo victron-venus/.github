@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Projects — Victron Venus</title>
-<meta name="description" content="All 30 open-source projects from the victron-venus organization and @4alvit: D-Bus services, ESPHome sensors, dashboards, forecasting, observability, and CI tooling for Victron Venus OS.">
+<meta name="description" content="All 31 open-source projects from the victron-venus organization and @4alvit: D-Bus services, thermostat control, ESPHome sensors, dashboards, forecasting, observability, and CI tooling for Victron Venus OS.">
 <link rel="canonical" href="https://victron-venus.github.io/.github/projects.html">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Projects — Victron Venus">
-<meta property="og:description" content="30 open-source projects for Victron Energy systems on Venus OS.">
+<meta property="og:description" content="31 open-source projects for Victron Energy systems on Venus OS.">
 <meta property="og:url" content="https://victron-venus.github.io/.github/projects.html">
 <meta name="theme-color" content="#0a1628">
 <link rel="icon" type="image/png" href="assets/img/logo.png">
@@ -40,7 +40,7 @@
 <div class="sec-head">
   <p class="eyebrow">Catalog</p>
   <h1 style="font-family:var(--font-display);font-size:clamp(1.9rem,3vw+0.5rem,2.8rem);margin-top:0.75rem">Every project in the ecosystem</h1>
-  <p>30 repositories across the <a href="https://github.com/victron-venus">victron-venus</a> organization
+  <p>31 repositories across the <a href="https://github.com/victron-venus">victron-venus</a> organization
   and the <a href="https://github.com/4alvit">@4alvit</a> account. Filter by layer or search by name.</p>
 </div>
 
@@ -112,13 +112,18 @@
 </section>
 
 <section class="group">
-  <h2>Control &amp; policy<span class="count">2</span></h2>
-  <p class="desc">The decision layer: what the inverter is allowed to do, and when.</p>
+  <h2>Control &amp; policy<span class="count">3</span></h2>
+  <p class="desc">Inverter control, thermostat coordination, and optional policy tooling.</p>
   <div class="grid-cards">
     <article class="proj" data-tags="control ess grid-zero">
       <h3><a href="https://github.com/victron-venus/inverter-control">inverter-control<span class="ext">↗</span></a></h3>
       <p>Grid-zero feed-in control with Home Assistant integration and web dashboard. The core ESS brain of the stack.</p>
       <div class="proj-meta"><span class="lang lang-python">Python</span><span class="tag">ess</span><span class="tag">quattro</span><span class="org-chip">org</span></div>
+    </article>
+    <article class="proj" id="inverter-climate" data-tags="control dbus climate home-assistant thermostat nest">
+      <h3><a href="https://github.com/victron-venus/inverter-climate">inverter-climate<span class="ext">↗</span></a></h3>
+      <p>Native Venus OS thermostat integration via Home Assistant and Google Nest. Publishes room temperature and optional setpoint and Heat/Off controls in the stock GUI v2 Switch pane and VRM Remote Console. Energy-aware preheating is enabled separately; observation is the default.</p>
+      <div class="proj-meta"><span class="lang lang-python">Python</span><span class="tag">thermostat</span><span class="tag">SetupHelper</span><span class="org-chip">org</span></div>
     </article>
     <article class="proj" data-tags="control policy safety">
       <h3><a href="https://github.com/victron-venus/venus-os-governance">venus-os-governance<span class="ext">↗</span></a></h3>
@@ -218,7 +223,7 @@
 
 <section class="group">
   <h2>Platform &amp; tooling<span class="count">8</span></h2>
-  <p class="desc">What keeps the other twenty-two honest: templates, tests, CI, and infrastructure as code.</p>
+  <p class="desc">Templates, tests, CI, and infrastructure as code for the rest of the ecosystem.</p>
   <div class="grid-cards">
     <article class="proj" data-tags="tooling ci github-actions">
       <h3><a href="https://github.com/victron-venus/venus-os-ci-toolkit">venus-os-ci-toolkit<span class="ext">↗</span></a></h3>
