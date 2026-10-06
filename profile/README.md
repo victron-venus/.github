@@ -100,10 +100,22 @@ SetupHelper/PackageManager from the `latest` branch; see the
 | [energy-data-rag-pipeline](https://github.com/4alvit/energy-data-rag-pipeline) | RAG pipeline for Victron docs + community knowledge (FastAPI, LangChain, pgvector) |
 | [solar-forecast-langgraph](https://github.com/4alvit/solar-forecast-langgraph) | Solar forecasting with LangGraph (OpenMeteo + historical data) |
 
+### Voice & displays
+
+These read-only adapters consume the energy reports owned by
+[inverter-gateway](https://github.com/victron-venus/inverter-gateway); they do not
+calculate energy statistics or send inverter commands.
+
+| Repository | Role |
+|------------|------|
+| [amazon-echo-home-voice](https://github.com/4alvit/amazon-echo-home-voice) | Alexa custom skill backend and screen cards; developer setup and physical device testing are separate steps |
+| [google-home-voice-stats](https://github.com/4alvit/google-home-voice-stats) | Standalone Cast video/speech reports, with optional Home Assistant/Matter voice triggers |
+
 ### Testing & infrastructure
 
 | Repository | Role |
 |------------|------|
+| [venus-os-integration-patterns](https://github.com/victron-venus/venus-os-integration-patterns) | Reference MQTT/D-Bus, HTTP and Home Assistant integration patterns |
 | [integration-tests](https://github.com/victron-venus/integration-tests) | MQTT / battery / PV integration test harness (reusable workflow) |
 | [terraform-github-victron](https://github.com/4alvit/terraform-github-victron) | Terraform for org repos, branch rules, and policies |
 | [terraform-github-4alvit](https://github.com/4alvit/terraform-github-4alvit) | Terraform for the 4alvit personal account |

@@ -51,6 +51,7 @@
   <button class="filter-btn" data-filter="sensing" aria-pressed="false">sensing &amp; firmware</button>
   <button class="filter-btn" data-filter="control" aria-pressed="false">control &amp; policy</button>
   <button class="filter-btn" data-filter="dashboards" aria-pressed="false">dashboards</button>
+  <button class="filter-btn" data-filter="voice" aria-pressed="false">voice &amp; displays</button>
   <button class="filter-btn" data-filter="ai" aria-pressed="false">forecast &amp; ai</button>
   <button class="filter-btn" data-filter="observability" aria-pressed="false">observability</button>
   <button class="filter-btn" data-filter="gateways" aria-pressed="false">gateways</button>
@@ -169,6 +170,23 @@
       <h3><a href="https://github.com/victron-venus/inverter-web-vitrine">inverter-web-vitrine<span class="ext">↗</span></a></h3>
       <p>Read-only public status page backed by inverter-gateway through an authenticated server-side proxy. Access credentials stay off the browser.</p>
       <div class="proj-meta"><span class="org-chip">org</span></div>
+    </article>
+  </div>
+</section>
+
+<section class="group">
+  <h2>Voice &amp; displays<span class="count">2</span></h2>
+  <p class="desc">Read-only reports from inverter-gateway. Energy statistics and freshness remain owned by the gateway; these adapters handle presentation.</p>
+  <div class="grid-cards">
+    <article class="proj" data-tags="voice alexa echo energy read-only">
+      <h3><a href="https://github.com/4alvit/amazon-echo-home-voice">amazon-echo-home-voice<span class="ext">↗</span></a></h3>
+      <p>Alexa custom skill backend for energy speech and screen cards. Uses authenticated gateway reports; developer setup, certification and physical device acceptance are separate steps.</p>
+      <div class="proj-meta"><span class="lang lang-python">Python</span><span class="org-chip">4alvit</span></div>
+    </article>
+    <article class="proj" data-tags="voice google nest cast energy read-only">
+      <h3><a href="https://github.com/4alvit/google-home-voice-stats">google-home-voice-stats<span class="ext">↗</span></a></h3>
+      <p>Standalone Cast video and speech reports using the gateway’s read-only energy API. Optional Home Assistant/Matter triggers add a voice entry point; Cast alone does not add voice commands.</p>
+      <div class="proj-meta"><span class="lang lang-python">Python</span><span class="org-chip">4alvit</span></div>
     </article>
   </div>
 </section>

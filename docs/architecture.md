@@ -120,6 +120,18 @@ flowchart TB
     style IC fill:#4ecdc4,color:#000
 ```
 
+### Read-only voice and display reports
+
+[inverter-gateway](https://github.com/victron-venus/inverter-gateway) owns the
+`/v1/energy` source selection, units, freshness and report wording.
+[amazon-echo-home-voice](https://github.com/4alvit/amazon-echo-home-voice) presents
+those reports through an Alexa custom skill;
+[google-home-voice-stats](https://github.com/4alvit/google-home-voice-stats)
+presents them as Cast video and speech, with optional Home Assistant/Matter
+voice triggers. These adapters run on a companion host and use scoped read-only
+gateway access. Registering a voice entry point and testing a physical device
+remain separate from installing source or a container.
+
 ## 3. Data & docs (optional)
 
 ```mermaid
