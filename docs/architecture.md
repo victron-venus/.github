@@ -26,7 +26,7 @@ flowchart TB
         PV["dbus-tasmota-pv"]
         EMP["dbus-emporia-vue"]
         GRD["dbus-esphome-grid-sensor"]
-        EV["dbus-evcharger / dbus-ev"]
+        EV["dbus-ev (vehicle / optional charger)"]
         PMP["dbus-pump"]
         IC["inverter-control"]
         EL["dbus-event-log (optional)"]
@@ -51,7 +51,7 @@ flowchart TB
     style OBS fill:#8e44ad,color:#fff
 ```
 
-Audited protocols: ESP/BMS → MQTT → `dbus-mqtt-battery`; Tasmota MQTT → `dbus-tasmota-pv`; Home Assistant → `dbus-ev`, `dbus-evcharger`, `dbus-pump` and `dbus-emporia-vue`. These packages publish D-Bus values consumed by the controller and native Venus services. `venus-os-observability` reads D-Bus for metrics. This is a repository map: the optional event-log and ESPHome grid bridge were not installed on the audited GX, and the archived governance project does not mediate its controller writes.
+Audited protocols: ESP/BMS → MQTT → `dbus-mqtt-battery`; Tasmota MQTT → `dbus-tasmota-pv`; Mercedes or Home Assistant → `dbus-ev`; Home Assistant → `dbus-pump` and `dbus-emporia-vue`. The optional integrated Mercedes charger belongs to `dbus-ev`; the standalone `dbus-evcharger` is archived. Follow the [EV migration guide](https://github.com/victron-venus/dbus-ev/blob/main/docs/mercedes-migration.md) before replacing an existing charger owner. These packages publish D-Bus values consumed by the controller and native Venus services. `venus-os-observability` reads D-Bus for metrics. This is a repository map: the optional event-log and ESPHome grid bridge were not installed on the audited GX, and the archived governance project does not mediate its controller writes.
 
 ### Thermostat integration on Venus OS
 

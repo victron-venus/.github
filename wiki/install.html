@@ -60,7 +60,8 @@ command -v svc svstat multilog</code></pre>
 <p>Install SetupHelper when the package requires it. Preserve local configuration and venvs during updates. Check dependencies before stopping the existing service; do not run global pip upgrades or network installers at boot.</p>
 <ul>
 <li>Battery and PV bridges: follow <a href="https://github.com/victron-venus/dbus-mqtt-battery">dbus-mqtt-battery</a>, <a href="https://github.com/victron-venus/dbus-virtual-battery">dbus-virtual-battery</a>, and <a href="https://github.com/victron-venus/dbus-tasmota-pv">dbus-tasmota-pv</a>.</li>
-<li>Home Assistant bridges: <a href="https://github.com/victron-venus/dbus-emporia-vue">Emporia</a>, <a href="https://github.com/victron-venus/dbus-ev">EV</a>, <a href="https://github.com/victron-venus/dbus-evcharger">EV charger</a>, and <a href="https://github.com/victron-venus/dbus-pump">pump</a> depend on their configured HA endpoint.</li>
+<li>Home Assistant bridges: <a href="https://github.com/victron-venus/dbus-emporia-vue">Emporia</a> and <a href="https://github.com/victron-venus/dbus-pump">water tank, pump and valve</a> depend on their configured HA endpoint.</li>
+<li><a href="https://github.com/victron-venus/dbus-ev">dbus-ev</a> reads Mercedes or Home Assistant vehicle telemetry; its integrated charger requires the Mercedes backend. The standalone charger repository is archived. Follow the <a href="https://github.com/victron-venus/dbus-ev/blob/main/docs/mercedes-migration.md">migration and rollback guide</a> and never run two owners of the same charger service.</li>
 <li><a href="https://github.com/victron-venus/inverter-control">inverter-control</a> uses <code>local_config.py</code>, with a preserved copy under <code>/data/setupOptions/inverter-control/</code>. Verify metering before enabling control.</li>
 <li><a href="https://github.com/victron-venus/venus-os-observability">Observability</a>: use metrics-only mode when trace export is unnecessary.</li>
 </ul>

@@ -98,7 +98,7 @@ type means the GX ignores your service no matter how correct the paths are.</p>
   <li><strong>Reconnect loops with backoff</strong> — MQTT and D-Bus drop during GX reboots; treat disconnects as normal.</li>
   <li><strong>One service, one job.</strong> Translation, decision-making, and audit live in separate processes (see <a href="architecture.html">architecture</a>).</li>
   <li><strong>Verify control integration.</strong> No governance or event-log service was running on the audited GX. Repository availability alone does not prove that live writes are mediated or audited. Inspect the deployed controller and validate each accepted D-Bus write.</li>
-  <li><strong>HA availability matters.</strong> dbus-ev and dbus-evcharger read Home Assistant and publish to D-Bus; inverter-control consumes those D-Bus values. Mark unavailable source data correctly during HA outages.</li>
+  <li><strong>Source availability matters.</strong> dbus-ev reads Mercedes or Home Assistant and publishes to D-Bus; its integrated charger requires the Mercedes backend. inverter-control consumes D-Bus values. Mark unavailable source data correctly during outages and consult the <a href="https://github.com/victron-venus/dbus-ev/blob/main/docs/mercedes-migration.md">migration guide</a> before replacing the archived standalone charger.</li>
   <li><strong>Daemontools logging.</strong> Services like dbus-tasmota-pv use the multilog daemontools pair for log rotation; others use stdout capture. Check each repo's service/run for the pattern.</li>
 </ul>
 

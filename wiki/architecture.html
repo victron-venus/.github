@@ -58,7 +58,7 @@ their own integration contracts. The repository map is not a live deployment inv
   <div class="layer">
     <h3>1 · Hardware &amp; sensing</h3>
     <p>ESP32s, Tasmota plugs, CT clamps, Emporia Vue submeters, EV chargers and water tanks/pumps provide readings through firmware or configured Home Assistant entities.
-    <a href="https://github.com/victron-venus/esphome-jbd-bms-mqtt">esphome-jbd-bms-mqtt</a><a href="https://github.com/victron-venus/dbus-esphome-grid-sensor">dbus-esphome-grid-sensor</a><a href="https://github.com/victron-venus/dbus-evcharger">dbus-evcharger</a><a href="https://github.com/victron-venus/dbus-pump">dbus-pump</a></p>
+    <a href="https://github.com/victron-venus/esphome-jbd-bms-mqtt">esphome-jbd-bms-mqtt</a><a href="https://github.com/victron-venus/dbus-esphome-grid-sensor">dbus-esphome-grid-sensor</a><a href="https://github.com/victron-venus/dbus-ev">dbus-ev</a><a href="https://github.com/victron-venus/dbus-pump">dbus-pump</a></p>
   </div>
   <div class="layer">
     <h3>2 · D-Bus services</h3>
@@ -73,7 +73,7 @@ their own integration contracts. The repository map is not a live deployment inv
   <div class="layer">
     <h3>4 · MQTT distribution</h3>
     <p>State leaves the GX over MQTT topics. fastapi-mqtt-gateway adds REST/WebSocket access for clients that can't speak MQTT natively.
-    <a href="https://github.com/victron-venus/fastapi-mqtt-gateway">fastapi-mqtt-gateway</a></p>
+    <a href="https://github.com/4alvit/fastapi-mqtt-gateway">fastapi-mqtt-gateway</a></p>
   </div>
   <div class="layer">
     <h3>5 · Consumption</h3>
@@ -114,7 +114,7 @@ acknowledgements at each boundary.</p>
 <ul>
   <li><strong>Forecasting:</strong> optional forecast consumers need a configured, tested control contract; repository availability alone does not close a control loop.</li>
   <li><strong>AI access:</strong> mcp-venus-os provides its own validation and write-confirmation rules. Verify its deployment and transport separately from the controller.</li>
-  <li><strong>EV data path:</strong> dbus-ev and dbus-evcharger read Home Assistant and publish D-Bus values for inverter-control. HA outages still require unavailable-value and recovery handling.</li>
+  <li><strong>EV data path:</strong> dbus-ev publishes vehicle telemetry from Mercedes or Home Assistant and can own the Mercedes charger service. The standalone charger repository is archived. Follow the <a href="https://github.com/victron-venus/dbus-ev/blob/main/docs/mercedes-migration.md">migration guide</a>, retain a single charger owner, and preserve unavailable-value handling during source outages.</li>
   <li><strong>Testing:</strong> broker and simulated D-Bus integration tests complement installer checks and device observation. Firmware compatibility and cold-boot recovery need target-device validation.</li>
 </ul>
 

@@ -18,7 +18,7 @@ See [CI and deployment workflow](docs/release-workflow.md) for required checks a
 
 ```
 index.html          Landing page with animated one-line system diagram + flagship projects
-projects.html       Full catalog of all ecosystem projects (filter + search)
+projects.html       Public project catalog, including archived replacements (filter + search)
 wiki/               Documentation hub
   install.html      Layer-by-layer full-stack install guide
   architecture.html The five layers, D-Bus vs MQTT split
@@ -38,6 +38,13 @@ redeploys automatically.
 
 Settings → Pages → *Deploy from a branch* → `main` / `/ (root)`. One-time setup; after that every
 push redeploys.
+
+## Keeping the catalog current
+
+Update `profile/README.md` and `projects.html` together when a public project is
+added, moved or archived. Keep related links in installation and architecture
+guides aligned with the maintained implementation. Verify repository visibility
+before publishing any name or URL; see [contribution rules](CONTRIBUTING.md).
 
 ## Docs
 

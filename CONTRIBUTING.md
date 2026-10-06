@@ -14,7 +14,17 @@ Each repository owns its code, issues, and releases. Pick the repo that matches 
 - **Dashboards** → [inverter-dashboard-go](https://github.com/victron-venus/inverter-dashboard-go), [inverter-dashboard](https://github.com/victron-venus/inverter-dashboard), or [inverter-desktop](https://github.com/victron-venus/inverter-desktop)
 - **Observability** → [inverter-monitoring](https://github.com/victron-venus/inverter-monitoring)
 - **Integration tests** → [integration-tests](https://github.com/victron-venus/integration-tests)
-- **Org / Terraform** → [terraform-github](https://github.com/victron-venus/terraform-github) or this `.github` repo for profile docs only
+- **Remote gateway and public status** → [inverter-gateway](https://github.com/victron-venus/inverter-gateway), [inverter-web-vitrine](https://github.com/victron-venus/inverter-web-vitrine), or [Cloudflare Access configuration](https://github.com/victron-venus/terraform-cloudflare-inverter-gateway)
+- **Vehicle and water bridges** → [dbus-ev](https://github.com/victron-venus/dbus-ev) or [dbus-pump](https://github.com/victron-venus/dbus-pump)
+- **Org / Terraform** → [terraform-github-victron](https://github.com/4alvit/terraform-github-victron); organization profile, catalog and website documentation belong here
+
+See the [public project catalog](https://victron-venus.github.io/.github/projects.html) for the remaining tools.
+
+Before adding a cross-project reference, verify that its repository is public and
+link to its current owner and maintained implementation. Do not publish names,
+links, deployment inventories or migration provenance for non-public repositories.
+A public catalog must not be generated from authenticated inventory without
+filtering repository visibility.
 
 ## Workflow
 

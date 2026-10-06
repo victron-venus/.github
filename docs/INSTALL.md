@@ -28,7 +28,8 @@ Native device services and their authoritative instructions:
 - [dbus-virtual-battery](https://github.com/victron-venus/dbus-virtual-battery): derived battery values; verify every required source and its availability.
 - [dbus-tasmota-pv](https://github.com/victron-venus/dbus-tasmota-pv): MQTT PV meters; configure the Tasmota topics and device mapping.
 - [dbus-emporia-vue](https://github.com/victron-venus/dbus-emporia-vue): Home Assistant measurements published as AC loads.
-- [dbus-ev](https://github.com/victron-venus/dbus-ev), [dbus-evcharger](https://github.com/victron-venus/dbus-evcharger), and [dbus-pump](https://github.com/victron-venus/dbus-pump): Home Assistant bridges. They depend on the configured HA endpoint and credentials.
+- [dbus-ev](https://github.com/victron-venus/dbus-ev): vehicle telemetry from Mercedes or Home Assistant; the integrated charger requires the Mercedes backend. The standalone [dbus-evcharger](https://github.com/victron-venus/dbus-evcharger) is archived. Follow the [migration and rollback guide](https://github.com/victron-venus/dbus-ev/blob/main/docs/mercedes-migration.md) before replacing it and never run both charger owners.
+- [dbus-pump](https://github.com/victron-venus/dbus-pump): Home Assistant water tank, pump and valve bridge; requires the configured HA endpoint and credentials.
 - [dbus-esphome-grid-sensor](https://github.com/victron-venus/dbus-esphome-grid-sensor): alternative MQTT grid bridge; not installed on the audited device.
 - [inverter-control](https://github.com/victron-venus/inverter-control): ESS controller. Configuration is Python `local_config.py`, optionally supplied through `/data/setupOptions/inverter-control/local_config.py`; it is not `config.yaml`.
 - [inverter-climate](https://github.com/victron-venus/inverter-climate): native thermostat integration via Home Assistant, with room-temperature telemetry, optional GUI v2 controls and separately enabled energy-aware preheating.
