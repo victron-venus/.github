@@ -2,10 +2,7 @@
   "repository": "victron-venus/.github",
   "mode": "validation-only",
   "default_branch": "main",
-  "validation_workflows": [
-    "validate.yml",
-    "security-scan.yml"
-  ],
+  "validation_workflows": ["validate.yml", "security-scan.yml", "codeql.yml", "dependency-review.yml"],
   "local_checks": [
     "bash scripts/ci.sh"
   ],
