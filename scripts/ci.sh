@@ -2,3 +2,4 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 python3 scripts/validate-source.py
+node --test tests/*.test.cjs
