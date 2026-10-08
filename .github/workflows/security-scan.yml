@@ -17,7 +17,7 @@ permissions:
 jobs:
   security-scan:
     name: Security Scan
-    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/security-scan.yml@a3456eaa36c6004eee85fa83daea714f2cee588a
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/security-scan.yml@ba44ba6d9b63e884a5bde2dd30a990bb434cfe74
     with:
       languages: 'javascript'
       run-codeql: true
