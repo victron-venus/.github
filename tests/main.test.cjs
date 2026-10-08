@@ -36,6 +36,10 @@ function page({ cookie = "", consent = false, original = false, blockedStorage =
   if (consent) storage.set("googtrans-consent", "1");
   if (original) storage.set("googtrans-original", "1");
   let reloads = 0;
+  const timers = [];
+  const appliedLanguages = [];
+  let widgetReady = false;
+  const combo = element({ dispatchEvent() { appliedLanguages.push(this.value); } });
   const battery = element({ dataset: { tags: "python battery" }, textContent: "Battery bridge" });
   const dashboard = element({ dataset: { tags: "go dashboard" }, textContent: "Dashboard UI" });
   const group = element({ querySelectorAll: () => [battery, dashboard] });
@@ -54,6 +58,7 @@ function page({ cookie = "", consent = false, original = false, blockedStorage =
         ".foot-inner select.lang-select": picker,
         ".filters": filters,
         ".empty-note": empty,
+        "select.goog-te-combo": widgetReady ? combo : null,
       }[selector] || null;
     },
     querySelectorAll(selector) { return selector === ".group" ? [group] : []; },
@@ -72,12 +77,23 @@ function page({ cookie = "", consent = false, original = false, blockedStorage =
       setItem(key, value) { if (blockedStorage) throw new Error("Storage blocked"); storage.set(key, value); },
       removeItem(key) { if (blockedStorage) throw new Error("Storage blocked"); storage.delete(key); },
     },
-    setTimeout() {},
+    setTimeout(callback) { timers.push(callback); },
+    Event: class Event { constructor(type) { this.type = type; } },
   };
   runInNewContext(source, context, { filename: "assets/js/main.js" });
   return {
     head, storage, document, picker, battery, dashboard, group, all, python, search, empty,
     reloads: () => reloads,
+    appliedLanguages,
+    initializeTranslation() {
+      function TranslateElement() { widgetReady = true; }
+      TranslateElement.InlineLayout = { SIMPLE: "simple" };
+      context.google = { translate: { TranslateElement } };
+      context.window.googleTranslateElementInit();
+    },
+    runPendingTimers() {
+      for (const callback of timers.splice(0)) callback();
+    },
     choose(code) { picker.value = code; picker.listeners.change(); },
   };
 }
@@ -151,4 +167,17 @@ test("catalog combines tag filters with search and exposes empty results", () =>
   assert.equal(view.dashboard.classList.contains("hidden"), false);
   assert.equal(view.group.classList.contains("hidden"), false);
   assert.equal(view.empty.classList.contains("show"), false);
+});
+
+
+test("pending retries cannot restore an older language after the widget loads", () => {
+  const view = page();
+  view.choose("de");
+  view.choose("fr");
+  view.initializeTranslation();
+  assert.deepEqual(view.appliedLanguages, ["fr"]);
+  view.runPendingTimers();
+  assert.deepEqual(view.appliedLanguages, ["fr", "fr"]);
+  assert.equal(view.picker.value, "fr");
+  assert.match(view.document.cookie, /\/en\/fr/);
 });
