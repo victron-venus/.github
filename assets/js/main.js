@@ -166,7 +166,7 @@
   }
 
   function setLang(code) {
-    if (code && !Object.prototype.hasOwnProperty.call(EURO_LANGS, code)) return;
+    if (code && !Object.hasOwn(EURO_LANGS, code)) return;
     if (!code) {
       // Back to original: drop the cookie, reload clean. Remember the
       // choice so later pages also stay in the original language.
@@ -208,7 +208,7 @@
       if (btn) setLang(btn.dataset.lang);
     });
     const header = document.querySelector("header.nav");
-    if (header) header.insertAdjacentElement("afterend", bar);
+    if (header) header.after(bar);
   }
 
   const footCol = document.querySelector(".foot-inner");
@@ -236,7 +236,7 @@
   if (
     !location.host.startsWith("localhost") &&
     hasTranslationConsent() &&
-    Object.prototype.hasOwnProperty.call(EURO_LANGS, savedLanguage)
+    Object.hasOwn(EURO_LANGS, savedLanguage)
   ) {
     ensureTranslateElement();
   }
