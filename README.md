@@ -31,8 +31,7 @@ assets/             CSS, JS, favicon — no build step, no framework
 sitemap.xml         Submitted via robots.txt
 ```
 
-The site is dependency-free static HTML/CSS/JS. Edit any file, push to `main` (via PR), Pages
-redeploys automatically.
+The site uses static HTML/CSS/JS with no build dependencies. Google Translate loads only after an explicit language choice; a locally remembered consent and language can restore that choice on later pages. Choosing Original revokes that consent. Edit files through a pull request; Pages redeploys when the change reaches `main`.
 
 ## Pages enablement
 
@@ -54,3 +53,7 @@ the website wiki. Contributing rules are in [`CONTRIBUTING.md`](CONTRIBUTING.md)
 ---
 
 Independent open-source projects. Not affiliated with or endorsed by Victron Energy B.V.
+
+## Security and project readiness
+
+See [security reporting and trust boundaries](SECURITY.md), [validation and contribution rules](CONTRIBUTING.md), and the [OpenSSF evidence and remaining requirements](docs/openssf-evidence.md). The repository does not currently contain a root license; [ownership and licensing review](docs/licensing-review.md) remains required before an open-source badge claim.

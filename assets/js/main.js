@@ -94,16 +94,25 @@
   }
 
   let translateWidget = null;
+  let translateLoading = false;
 
   // "Visitor chose Original" flag (localStorage can throw in privacy modes).
   function origFlagSet(on) {
     try {
-      if (on) localStorage.setItem("googtrans-original", "1");
-      else localStorage.removeItem("googtrans-original");
+      if (on) {
+        localStorage.setItem("googtrans-original", "1");
+        localStorage.removeItem("googtrans-consent");
+      } else {
+        localStorage.removeItem("googtrans-original");
+        localStorage.setItem("googtrans-consent", "1");
+      }
     } catch (e) {}
   }
-  function origFlagGet() {
-    try { return localStorage.getItem("googtrans-original"); } catch (e) { return null; }
+  function hasTranslationConsent() {
+    try {
+      return localStorage.getItem("googtrans-consent") === "1" &&
+        !localStorage.getItem("googtrans-original");
+    } catch (e) { return false; }
   }
 
   // Google renders its own <select class="goog-te-combo"> inside the hidden
@@ -111,6 +120,7 @@
   function applyViaCombo(code) {
     let tries = 0;
     (function poke() {
+      if (activeLang() !== code) return; // A newer choice cancels old retries.
       const combo =
         translateWidget && document.querySelector("select.goog-te-combo");
       if (combo && code) {
@@ -124,8 +134,10 @@
   }
 
   function ensureTranslateElement() {
-    if (translateWidget) return;
+    if (translateWidget || translateLoading) return;
+    translateLoading = true;
     window.googleTranslateElementInit = function () {
+      if (translateWidget) return;
       // Hidden mount: translation is driven from our own picker UI.
       const mount = document.createElement("div");
       mount.id = "google_translate_element";
@@ -146,13 +158,18 @@
     s.async = true;
     s.src =
       "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+    s.onerror = function () {
+      translateLoading = false;
+      s.remove(); // A later explicit choice can retry a failed request.
+    };
     document.head.appendChild(s);
   }
 
   function setLang(code) {
+    if (code && !Object.prototype.hasOwnProperty.call(EURO_LANGS, code)) return;
     if (!code) {
       // Back to original: drop the cookie, reload clean. Remember the
-      // choice so browser-language auto-detect stays off afterwards.
+      // choice so later pages also stay in the original language.
       document.cookie = "googtrans=;path=/;max-age=0";
       origFlagSet(true);
       location.reload();
@@ -180,7 +197,7 @@
     bar.className = "lang-top container";
     bar.setAttribute("aria-label", "In-place Google Translate");
     bar.innerHTML =
-      '<span class="lt-label">🌐 Translate:</span>' +
+      '<span class="lt-label">🌐 Google Translate:</span>' +
       QUICK_LANGS.map(
         ([code, name]) =>
           `<button type="button" class="lang-btn" data-lang="${code}">${name}</button>`
@@ -199,7 +216,8 @@
     const wrap = document.createElement("div");
     wrap.className = "foot-col";
     wrap.innerHTML =
-      '<h4>Translate</h4>' +
+      '<h4>Google Translate</h4>' +
+      '<p>Choosing a language loads Google’s translation service.</p>' +
       '<select class="lang-select" aria-label="Translate this page">' +
       '<option value="">English (original)</option>' +
       Object.entries(EURO_LANGS)
@@ -212,16 +230,15 @@
     footCol.appendChild(wrap);
   }
 
-  // Browser-language auto-detect: first visit in a non-English browser
-  // translates automatically. Skipped once the visitor picks Original
-  // (opt-out flag) or a language of their own.
+  // Restore only an explicit choice made by this version. Older cookies may
+  // have been created automatically from browser language, without consent.
+  const savedLanguage = activeLang();
   if (
     !location.host.startsWith("localhost") &&
-    !activeLang() &&
-    !origFlagGet()
+    hasTranslationConsent() &&
+    Object.prototype.hasOwnProperty.call(EURO_LANGS, savedLanguage)
   ) {
-    const auto = (navigator.language || "").slice(0, 2).toLowerCase();
-    if (auto !== "en" && EURO_LANGS[auto]) setLang(auto);
+    ensureTranslateElement();
   }
 
   markActive(activeLang());

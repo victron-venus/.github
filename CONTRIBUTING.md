@@ -53,3 +53,20 @@ Use GitHub Discussions (when enabled) or open a question issue in the most relev
 ## Code of conduct
 
 Be respectful and constructive. Report unacceptable behavior to repository maintainers.
+
+## Working on this website
+
+The maintained application source is `assets/js/main.js`, `assets/css/`, the root HTML pages and `wiki/`. Keep the HTML useful without JavaScript. Translation is an optional external service: do not load it from the browser language or a legacy language cookie. An explicit visitor choice is required before storing translation consent.
+
+Use Node.js 22, Python 3.12, PyYAML 6.0.3 and actionlint 1.7.12, then run:
+
+```sh
+python3 -m pip install --only-binary=:all: PyYAML==6.0.3
+bash scripts/ci.sh
+```
+
+This checks tracked-source syntax, GitHub workflow semantics and the dependency-free Node regression suite. `node --test tests/*.test.cjs` runs the browser-logic tests alone. They execute the actual script against a small DOM fixture and verify consent, retry handling, filtering and search. They do not replace visual, keyboard/screen-reader, real-browser or third-party translation testing. Review changed pages locally with `python3 -m http.server 8000` and check mobile/desktop layouts and links.
+
+Every major feature and regression fix should add appropriate automated coverage. Describe behavior, tests and limitations in the pull request. Report bugs and feature requests in English with the affected URL/commit, browser and reproduction steps; maintainers should respond constructively to actionable reports. Report security defects through [SECURITY.md](SECURITY.md).
+
+Do not import code, images or documentation without documenting their source and compatible licensing. The root license is currently missing; follow the [ownership review](docs/licensing-review.md) rather than assigning a license to material owned by others.
