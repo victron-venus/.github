@@ -241,5 +241,5 @@
     ensureTranslateElement();
   }
 
-  markActive(activeLang());
+  markActive(hasTranslationConsent() ? activeLang() : "");
 })();

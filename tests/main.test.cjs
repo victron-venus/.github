@@ -76,7 +76,7 @@ function page({ cookie = "", consent = false, original = false, blockedStorage =
   };
   runInNewContext(source, context, { filename: "assets/js/main.js" });
   return {
-    head, storage, document, battery, dashboard, group, all, python, search, empty,
+    head, storage, document, picker, battery, dashboard, group, all, python, search, empty,
     reloads: () => reloads,
     choose(code) { picker.value = code; picker.listeners.change(); },
   };
@@ -84,7 +84,9 @@ function page({ cookie = "", consent = false, original = false, blockedStorage =
 
 test("non-English browser and legacy language cookie do not load a third party", () => {
   for (const cookie of ["", "googtrans=/en/de"]) {
-    assert.equal(page({ cookie }).head.children.length, 0);
+    const view = page({ cookie });
+    assert.equal(view.head.children.length, 0);
+    assert.equal(view.picker.value, "");
   }
 });
 
