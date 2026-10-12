@@ -42,6 +42,8 @@ flowchart LR
 Browse the [searchable public project catalog](https://victron-venus.github.io/.github/projects.html)
 for deployment targets and related tools. Each repository owns its installation
 requirements and release lifecycle; availability here does not imply a live deployment.
+The [deployment evidence index](https://github.com/victron-venus/.github/blob/main/docs/DEPLOYMENT-EVIDENCE.md) links the recorded
+runtime and device checks and identifies what those checks do not establish.
 
 ### Core control & bridging
 
