@@ -42,7 +42,9 @@ push redeploys.
 
 Update `profile/README.md` and `projects.html` together when a public project is
 added, moved or archived. Keep related links in installation and architecture
-guides aligned with the maintained implementation. Verify repository visibility
+guides aligned with the maintained implementation. Keep deployment claims tied to
+the dated, scoped records in [the evidence index](docs/DEPLOYMENT-EVIDENCE.md);
+a release or passing CI is not a current fleet inventory. Verify repository visibility
 before publishing any name or URL; see [contribution rules](CONTRIBUTING.md).
 
 ## Docs

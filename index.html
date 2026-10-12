@@ -146,7 +146,7 @@
     <span><a href="projects.html"><b>Public project catalog</b></a></span>
     <span><b>Venus OS</b> and companion-host tools</span>
     <span><b>Python · Go · Vue · ESPHome</b></span>
-    <span><b>100%</b> open source</span>
+    <span><b>Public source</b> and project documentation</span>
   </div>
 </section>
 
@@ -155,12 +155,12 @@
     <div class="sec-head">
       <p class="eyebrow">Flagship</p>
       <h2>Six projects that carry the system</h2>
-      <p>Each one runs in production on a real installation. The other twenty-five build around them.</p>
+      <p>These projects cover control, telemetry, interfaces and development tooling. Deployment and device verification vary by component; see the <a href="https://github.com/victron-venus/.github/blob/main/docs/DEPLOYMENT-EVIDENCE.md">documented evidence and remaining checks</a>.</p>
     </div>
     <div class="grid-cards">
       <article class="proj">
         <h3><a href="https://github.com/victron-venus/inverter-control">inverter-control<span class="ext">↗</span></a></h3>
-        <p>Grid-zero feed-in control for Victron inverters. Watches Home Assistant power data, drives the ESS over D-Bus, ships with its own web dashboard.</p>
+        <p>Grid-zero feed-in control for Victron inverters. Reads configured Venus D-Bus measurements and applies validated ESS setpoints; dashboards are separate clients.</p>
         <div class="proj-meta"><span class="lang lang-python">Python</span><span class="tag">ess</span><span class="tag">grid-zero</span><span class="org-chip">org</span></div>
       </article>
       <article class="proj">
@@ -175,17 +175,17 @@
       </article>
       <article class="proj">
         <h3><a href="https://github.com/4alvit/solar-forecast-langgraph">solar-forecast-langgraph<span class="ext">↗</span></a></h3>
-        <p>LangGraph workflow that forecasts generation from OpenMeteo weather plus historical inverter data, and pre-charges before cloudy periods.</p>
+        <p>LangGraph workflow that forecasts generation from OpenMeteo weather and historical inverter data. Live control requires a separately configured and tested consumer.</p>
         <div class="proj-meta"><span class="lang lang-python">Python</span><span class="tag">langgraph</span><span class="tag">openmeteo</span><span class="org-chip">4alvit</span></div>
       </article>
       <article class="proj">
         <h3><a href="https://github.com/4alvit/mcp-venus-os">mcp-venus-os<span class="ext">↗</span></a></h3>
-        <p>MCP server exposing Venus OS over D-Bus and MQTT to AI assistants &mdash; read anything, write only through safety-constrained control.</p>
+        <p>Companion MCP server for configured Venus OS D-Bus and MQTT access. Write access depends on the enabled tools, permissions and deployed device policy.</p>
         <div class="proj-meta"><span class="lang lang-python">Python</span><span class="tag">mcp</span><span class="tag">ai</span><span class="org-chip">4alvit</span></div>
       </article>
       <article class="proj">
         <h3><a href="https://github.com/victron-venus/venus-os-ci-toolkit">venus-os-ci-toolkit<span class="ext">↗</span></a></h3>
-        <p>Reusable GitHub Actions workflows behind every repo here: lint, test, coverage, govulncheck, Scorecard &mdash; pinned by commit SHA.</p>
+        <p>Reusable GitHub Actions workflows for adopting projects: lint, test, coverage, govulncheck and Scorecard &mdash; pinned by commit SHA.</p>
         <div class="proj-meta"><span class="tag">ci</span><span class="tag">actions</span><span class="org-chip">org</span></div>
       </article>
     </div>
