@@ -59,3 +59,9 @@ Independent open-source projects. Not affiliated with or endorsed by Victron Ene
 ## Security and project readiness
 
 See [security reporting and trust boundaries](SECURITY.md), [validation and contribution rules](CONTRIBUTING.md), and the [OpenSSF evidence and remaining requirements](docs/openssf-evidence.md). The root [MIT license](LICENSE) covers original source and documentation; [third-party notices](THIRD_PARTY_NOTICES.md) preserve separate terms and marks.
+
+## Maintenance and security evidence
+
+See [governance](GOVERNANCE.md), [Code of Conduct](CODE_OF_CONDUCT.md), [roadmap](ROADMAP.md), [source changes](CHANGELOG.md) and [quality evidence](docs/quality.md). Source revisions use complete Git identities; no synthetic application releases are created. Optional CLI status operations use the documented [transport profile](docs/transport-security.md).
+
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/15586/badge)](https://www.bestpractices.dev/projects/15586)

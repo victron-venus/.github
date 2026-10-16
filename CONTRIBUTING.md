@@ -52,7 +52,7 @@ Use GitHub Discussions (when enabled) or open a question issue in the most relev
 
 ## Code of conduct
 
-Be respectful and constructive. Report unacceptable behavior to repository maintainers.
+Follow the [Code of Conduct](CODE_OF_CONDUCT.md), including its confidential reporting channel and enforcement policy.
 
 ## Working on this website
 
@@ -61,7 +61,7 @@ The maintained application source is `assets/js/main.js`, `assets/css/`, the roo
 Use Node.js 22, Python 3.12, PyYAML 6.0.3 and actionlint 1.7.12, then run:
 
 ```sh
-python3 -m pip install --only-binary=:all: PyYAML==6.0.3
+python3 -m pip install --require-hashes --only-binary=:all: -r .github/requirements-workflow-contracts.txt -r .github/requirements-lint.txt
 bash scripts/ci.sh
 ```
 
@@ -70,3 +70,11 @@ This checks tracked-source syntax, GitHub workflow semantics and the dependency-
 Every major feature and regression fix should add appropriate automated coverage. Describe behavior, tests and limitations in the pull request. Report bugs and feature requests in English with the affected URL/commit, browser and reproduction steps; maintainers should respond constructively to actionable reports. Report security defects through [SECURITY.md](SECURITY.md).
 
 Do not import code, images or documentation without documenting their source and compatible licensing. Contribute original material under the root MIT license only when authorized to do so; preserve third-party attribution and terms in THIRD_PARTY_NOTICES.md.
+
+## Participation and required regression coverage
+
+Follow the [Code of Conduct](CODE_OF_CONDUCT.md), [governance](GOVERNANCE.md) and [roadmap](ROADMAP.md). All contributors, including the primary maintainer, must add automated tests for major new functionality and regression tests for defect fixes, with relevant negative inputs. Use PEP8-compatible Python, existing JavaScript conventions and deterministic HTML/YAML formatting; address diagnostics rather than disabling checks globally.
+
+Follow [source publication](RELEASING.md) and update [change notes](CHANGELOG.md) for user-visible behavior and security fixes. Optional GitHub CLI status commands use the documented [transport profile](docs/transport-security.md).
+
+Install the pinned Python diagnostic tool with `python3 -m pip install --require-hashes --only-binary=:all: -r .github/requirements-lint.txt`. The local gate runs Ruff syntax/undefined-name/control-flow checks across authored and vendored Python with `--ignore-noqa`, plus the existing source, workflow and behavior checks. Maximum warning strictness is not claimed.

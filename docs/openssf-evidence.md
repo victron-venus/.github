@@ -14,13 +14,8 @@ The maintained browser behavior is in [main.js](../assets/js/main.js): project f
 
 [CodeQL](../.github/workflows/codeql.yml) analyzes JavaScript and Python; [dependency review](../.github/workflows/dependency-review.yml), [security scanning](../.github/workflows/security-scan.yml) and [quality gate](../.github/workflows/quality-gate.yml) define the other checks. Read the actual results for the submitted commit; a workflow's existence or a successful metadata check does not establish a clean security assessment.
 
-## Remaining assessment work
+## Current assessment boundaries
 
-- Root MIT licensing is published for owner-confirmed original source and documentation; keep imported notices current.
-- Verify confidential reporting and historical handling of feedback/vulnerabilities, including channels outside GitHub; new documentation cannot establish past response times.
-- Obtain this project's primary developer's secure-design and vulnerability-prevention attestations.
-- Audit all open code, dependency and secret-scanning findings and review their age.
-- Verify interface documentation, accessibility, actual browser behavior, and the external translation integration; DOM fixture tests do not cover them fully.
-- Verify deployment/change history and useful notes for user-facing changes. This repository has validation-only CI and no tagged application release pipeline; do not invent package release evidence.
+The owner-confirmed MIT grant, maintainer attestations and dated report/scanning inventory are recorded in [quality evidence](quality.md). [Governance](../GOVERNANCE.md), [conduct](../CODE_OF_CONDUCT.md), [roadmap](../ROADMAP.md) and [source publication](../RELEASING.md) define the ongoing process. Optional CLI network operations use the [transport profile](transport-security.md).
 
-Record the final merged commit and passing checks before submitting. Add only this project's actual badge URL when an assessment exists and accurately reflects its status.
+Full browser accessibility, real third-party translation behavior, complete coverage and backup-maintainer continuity remain unestablished. A merge or passing fixture test does not prove Pages deployment or linked-site security. Source revisions use full Git identities and [human-readable changes](../CHANGELOG.md), not invented package versions.
