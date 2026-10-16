@@ -4,7 +4,7 @@ This is an evidence index for [OpenSSF Passing criteria](https://www.bestpractic
 
 ## Public development and interfaces
 
-[Source and history](https://github.com/victron-venus/.github), [issues](https://github.com/victron-venus/.github/issues) and [pull requests](https://github.com/victron-venus/.github/pulls) record public development. [README](../README.md) describes the site structure and deployment, [CONTRIBUTING](../CONTRIBUTING.md) covers reporting/testing/review, and [SECURITY](../SECURITY.md) defines private reporting, response goals and trust boundaries. [Licensing review](licensing-review.md) records the missing root license and a proposal for owner review; this is an unresolved Passing requirement.
+[Source and history](https://github.com/victron-venus/.github), [issues](https://github.com/victron-venus/.github/issues) and [pull requests](https://github.com/victron-venus/.github/pulls) record public development. [README](../README.md) describes the site structure and deployment, [CONTRIBUTING](../CONTRIBUTING.md) covers reporting/testing/review, and [SECURITY](../SECURITY.md) defines private reporting, response goals and trust boundaries. The root [MIT license](../LICENSE) and [scope record](licensing-review.md) document the owner-confirmed grant; third-party terms remain separate.
 
 The maintained browser behavior is in [main.js](../assets/js/main.js): project filters/search, diagram hover states, footer year and an optional Google Translate integration. The translation trust boundary requires explicit consent, including before restoring a saved language. Static HTML remains readable when JavaScript is unavailable. Public catalog changes require checking repository visibility.
 
@@ -16,7 +16,7 @@ The maintained browser behavior is in [main.js](../assets/js/main.js): project f
 
 ## Remaining assessment work
 
-- Publish an owner-approved open-source license after provenance review.
+- Root MIT licensing is published for owner-confirmed original source and documentation; keep imported notices current.
 - Verify confidential reporting and historical handling of feedback/vulnerabilities, including channels outside GitHub; new documentation cannot establish past response times.
 - Obtain this project's primary developer's secure-design and vulnerability-prevention attestations.
 - Audit all open code, dependency and secret-scanning findings and review their age.
