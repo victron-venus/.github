@@ -4,7 +4,7 @@
 
 Report vulnerabilities in this website, profile or shared workflows privately through [GitHub vulnerability reporting](https://github.com/victron-venus/.github/security/advisories/new). For another project, use its own security policy and report form. Include the affected URL or commit, reproduction steps and impact; omit active secrets and personal information. If the private channel is unavailable, open an issue requesting confidential contact without exploit details.
 
-Maintainers aim to acknowledge reports within 14 days and correct confirmed exploitable medium-or-higher vulnerabilities within 60 days of confirmation. Prioritize critical issues, coordinate ordinary disclosure with a fix or mitigation, and publish protective guidance earlier if active exploitation or urgent risk warrants it. Identify assigned CVEs/advisory identifiers in security release or deployment notes. These are policies, not historical response-time claims.
+Maintainers aim to acknowledge reports within 14 days and correct confirmed exploitable medium-or-higher vulnerabilities within 60 days of becoming publicly known. Prioritize critical issues, coordinate ordinary disclosure with a fix or mitigation, and publish protective guidance earlier if active exploitation or urgent risk warrants it. Identify assigned CVEs/advisory identifiers in security release or deployment notes. These are policies, not historical response-time claims.
 
 ## Scope and trust boundaries
 
@@ -15,3 +15,9 @@ Translation is an optional third-party service. A language choice loads Google's
 CI processes contributor-controlled files. Keep workflow tokens minimal, pin actions to reviewed commits, validate untrusted input and avoid privileged execution of unreviewed changes. Static analysis and local browser-logic tests are required checks; they do not prove the behavior of remotely served third-party code.
 
 Obtain source through the repository's HTTPS endpoint. This validation-only repository deploys through its existing Pages configuration rather than tagged application packages. Describe user-visible changes and security fixes in reviewed pull requests. Follow [CONTRIBUTING.md](CONTRIBUTING.md) for checks and [OpenSSF evidence](docs/openssf-evidence.md) for verification gaps.
+
+## Remediation and disclosure
+
+Publicly known medium-or-higher vulnerabilities must be addressed within 60 days of public knowledge; confirmation does not restart that clock. Prioritize critical issues, reproduce with synthetic inputs, record affected revisions, test the correction, coordinate disclosure and identify assigned advisories in source change notes. Credit reporters unless they request anonymity. No prior response history is inferred from this policy.
+
+The current [transport profile](docs/transport-security.md) and [quality evidence](docs/quality.md) state supported boundaries and dated findings.
