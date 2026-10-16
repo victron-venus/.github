@@ -61,7 +61,7 @@ The maintained application source is `assets/js/main.js`, `assets/css/`, the roo
 Use Node.js 22, Python 3.12, PyYAML 6.0.3 and actionlint 1.7.12, then run:
 
 ```sh
-python3 -m pip install --only-binary=:all: PyYAML==6.0.3
+python3 -m pip install --require-hashes --only-binary=:all: -r .github/requirements-workflow-contracts.txt -r .github/requirements-lint.txt
 bash scripts/ci.sh
 ```
 
@@ -76,3 +76,5 @@ Do not import code, images or documentation without documenting their source and
 Follow the [Code of Conduct](CODE_OF_CONDUCT.md), [governance](GOVERNANCE.md) and [roadmap](ROADMAP.md). All contributors, including the primary maintainer, must add automated tests for major new functionality and regression tests for defect fixes, with relevant negative inputs. Use PEP8-compatible Python, existing JavaScript conventions and deterministic HTML/YAML formatting; address diagnostics rather than disabling checks globally.
 
 Follow [source publication](RELEASING.md) and update [change notes](CHANGELOG.md) for user-visible behavior and security fixes. Optional GitHub CLI status commands use the documented [transport profile](docs/transport-security.md).
+
+Install the pinned Python diagnostic tool with `python3 -m pip install --require-hashes --only-binary=:all: -r .github/requirements-lint.txt`. The local gate runs Ruff syntax/undefined-name/control-flow checks across authored and vendored Python with `--ignore-noqa`, plus the existing source, workflow and behavior checks. Maximum warning strictness is not claimed.
