@@ -69,4 +69,4 @@ This checks tracked-source syntax, GitHub workflow semantics and the dependency-
 
 Every major feature and regression fix should add appropriate automated coverage. Describe behavior, tests and limitations in the pull request. Report bugs and feature requests in English with the affected URL/commit, browser and reproduction steps; maintainers should respond constructively to actionable reports. Report security defects through [SECURITY.md](SECURITY.md).
 
-Do not import code, images or documentation without documenting their source and compatible licensing. The root license is currently missing; follow the [ownership review](docs/licensing-review.md) rather than assigning a license to material owned by others.
+Do not import code, images or documentation without documenting their source and compatible licensing. Contribute original material under the root MIT license only when authorized to do so; preserve third-party attribution and terms in THIRD_PARTY_NOTICES.md.

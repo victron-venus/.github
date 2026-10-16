@@ -58,4 +58,4 @@ Independent open-source projects. Not affiliated with or endorsed by Victron Ene
 
 ## Security and project readiness
 
-See [security reporting and trust boundaries](SECURITY.md), [validation and contribution rules](CONTRIBUTING.md), and the [OpenSSF evidence and remaining requirements](docs/openssf-evidence.md). The repository does not currently contain a root license; [ownership and licensing review](docs/licensing-review.md) remains required before an open-source badge claim.
+See [security reporting and trust boundaries](SECURITY.md), [validation and contribution rules](CONTRIBUTING.md), and the [OpenSSF evidence and remaining requirements](docs/openssf-evidence.md). The root [MIT license](LICENSE) covers original source and documentation; [third-party notices](THIRD_PARTY_NOTICES.md) preserve separate terms and marks.
