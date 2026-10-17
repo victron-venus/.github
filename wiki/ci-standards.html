@@ -78,7 +78,7 @@ and release guides.</p>
   commit SHA — never a tag or branch. Tags move; SHAs don't. This is the supply-chain boundary.</li>
   <li><strong>Harden runners.</strong> Workflows include
   <code>step-security/harden-runner</code> to audit egress network calls.</li>
-  <li><strong>Never push to main.</strong> Feature branch from the default branch, open a PR, let CI
+  <li><strong>Never push to the default branch.</strong> Feature branch from the default branch, open a PR, let CI
   and CodeQL pass, merge via review. Eligible, non-draft PRs receive auto-approval independently
   of labels. The <code>automerge</code> label enables automatic merging after required checks
   and review requirements are satisfied.</li>
