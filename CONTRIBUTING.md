@@ -29,7 +29,7 @@ filtering repository visibility.
 ## Workflow
 
 1. Fork the target repository (or branch within the org if you are a maintainer).
-2. Create a feature branch from `main`.
+2. Create a feature branch from the target repository's default branch.
 3. Make focused changes with tests where applicable.
 4. Use [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `chore:`, etc.).
 5. Open a pull request; CI and CodeQL must pass.
@@ -44,7 +44,12 @@ filtering repository visibility.
 
 ## Releases
 
-Package repos (`inverter-control`, `dbus-mqtt-battery`, `dbus-tasmota-pv`, dashboards) use tagged releases (`v*`) and Venus `setup` scripts. Bump `version` / `VERSION` files in the same commit as the tag when applicable.
+Application repositories define their version files, validation and artifacts in
+`.release-policy.json`. Follow the target repository's `RELEASING.md` and
+`docs/release-workflow.md`: review base-version changes through a PR, publish
+immutable beta/RC candidates through the release pipeline, and promote the tested
+RC bytes after approval. Do not create release tags by hand. This website uses
+[source publication](RELEASING.md) rather than application releases.
 
 ## Questions
 
