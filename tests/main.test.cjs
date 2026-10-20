@@ -16,6 +16,8 @@ function element(properties = {}) {
     textContent: "",
     attributes: {},
     classList: {
+      add(name) { classes.add(name); },
+      remove(name) { classes.delete(name); },
       toggle(name, enabled) { enabled ? classes.add(name) : classes.delete(name); },
       contains(name) { return classes.has(name); },
     },
@@ -48,6 +50,21 @@ function page({ cookie = "", consent = false, original = false, blockedStorage =
   const filters = element({ querySelectorAll: () => [all, python] });
   const search = element();
   const empty = element();
+  const nodes = {
+    hub: element({ dataset: { node: "hub" } }),
+    mqtt: element({ dataset: { node: "mqtt" } }),
+    mqtt2: element({ dataset: { node: "mqtt2" } }),
+    unconnected: element({ dataset: { node: "unconnected" } }),
+    withoutId: element(),
+  };
+  // Like index.html, edges may connect more than one named node.
+  const edges = [
+    element({ dataset: { n: "hub mqtt" } }),
+    element({ dataset: { n: "mqtt dash" } }),
+    element({ dataset: { n: "mqtt2 ha" } }),
+    element({ dataset: { n: "pv" } }),
+  ];
+  const years = [element({ textContent: "2026" }), element({ textContent: "2025" })];
   const document = {
     cookie,
     head,
@@ -61,7 +78,17 @@ function page({ cookie = "", consent = false, original = false, blockedStorage =
         "select.goog-te-combo": widgetReady ? combo : null,
       }[selector] || null;
     },
-    querySelectorAll(selector) { return selector === ".group" ? [group] : []; },
+    querySelectorAll(selector) {
+      if (selector === ".group") return [group];
+      if (selector === ".diagram .dg-node") return Object.values(nodes);
+      if (selector === ".diagram .dg-edge") return edges;
+      if (selector === "[data-year]") return years;
+      const edgeMatch = /^\.diagram \.dg-edge\[data-n~="([^"]+)"\]$/.exec(selector);
+      if (edgeMatch) {
+        return edges.filter((edge) => edge.dataset.n.split(/\s+/).includes(edgeMatch[1]));
+      }
+      return [];
+    },
     getElementById(id) { return id === "proj-search" ? search : null; },
     createElement(tagName) {
       return element({ tagName, querySelector: (selector) => selector === "select" ? picker : null });
@@ -79,10 +106,12 @@ function page({ cookie = "", consent = false, original = false, blockedStorage =
     },
     setTimeout(callback) { timers.push(callback); },
     Event: class Event { constructor(type) { this.type = type; } },
+    Date: class extends Date { constructor() { super("2042-06-15T12:00:00Z"); } },
   };
   runInNewContext(source, context, { filename: "assets/js/main.js" });
   return {
     head, storage, document, picker, battery, dashboard, group, all, python, search, empty,
+    nodes, edges, years,
     reloads: () => reloads,
     appliedLanguages,
     initializeTranslation() {
@@ -167,6 +196,45 @@ test("catalog combines tag filters with search and exposes empty results", () =>
   assert.equal(view.dashboard.classList.contains("hidden"), false);
   assert.equal(view.group.classList.contains("hidden"), false);
   assert.equal(view.empty.classList.contains("show"), false);
+});
+
+test("diagram hover highlights only edges with the complete node token", () => {
+  const { nodes, edges } = page();
+  const highlights = () => edges.map((edge) => edge.classList.contains("hot"));
+  assert.deepEqual(highlights(), [false, false, false, false]);
+  nodes.mqtt.listeners.mouseenter();
+  assert.deepEqual(highlights(), [true, true, false, false]);
+  nodes.mqtt.listeners.mouseleave();
+  assert.deepEqual(highlights(), [false, false, false, false]);
+
+  nodes.hub.listeners.mouseenter();
+  assert.deepEqual(highlights(), [true, false, false, false]);
+  nodes.hub.listeners.mouseleave();
+  nodes.mqtt2.listeners.mouseenter();
+  assert.deepEqual(highlights(), [false, false, true, false]);
+  nodes.mqtt2.listeners.mouseleave();
+  assert.deepEqual(highlights(), [false, false, false, false]);
+});
+
+test("leaving a diagram node preserves highlights on unrelated edges", () => {
+  const { nodes, edges } = page();
+  nodes.mqtt.listeners.mouseenter();
+  nodes.mqtt2.listeners.mouseenter();
+  nodes.mqtt.listeners.mouseleave();
+  assert.deepEqual(edges.map((edge) => edge.classList.contains("hot")), [false, false, true, false]);
+});
+
+test("unconnected nodes do not highlight edges and unnamed nodes have no hover handlers", () => {
+  const { nodes, edges } = page();
+  nodes.unconnected.listeners.mouseenter();
+  assert.ok(edges.every((edge) => !edge.classList.contains("hot")));
+  nodes.unconnected.listeners.mouseleave();
+  assert.ok(edges.every((edge) => !edge.classList.contains("hot")));
+  assert.deepEqual(nodes.withoutId.listeners, {});
+});
+
+test("all footer years use the current year from the clock", () => {
+  assert.deepEqual(page().years.map((year) => String(year.textContent)), ["2042", "2042"]);
 });
 
 
