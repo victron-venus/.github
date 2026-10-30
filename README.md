@@ -65,3 +65,7 @@ See [security reporting and trust boundaries](SECURITY.md), [validation and cont
 See [governance](GOVERNANCE.md), [Code of Conduct](CODE_OF_CONDUCT.md), [roadmap](ROADMAP.md), [source changes](CHANGELOG.md) and [quality evidence](docs/quality.md). Source revisions use complete Git identities; no synthetic application releases are created. Optional CLI status operations use the documented [transport profile](docs/transport-security.md).
 
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/15586/badge)](https://www.bestpractices.dev/projects/15586)
+
+## Public website
+
+The [Pages site](https://victron-venus.github.io/.github/) includes the project catalog and searchable guides. See [editing, validation and publication](docs/PUBLIC_SITE.md) for maintenance.

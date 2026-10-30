@@ -5,25 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>404 — Victron Venus</title>
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#0a1628">
+<meta name="theme-color" content="#151715">
 <link rel="icon" type="image/png" href="/.github/assets/img/logo.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/.github/assets/css/style.css">
 </head>
-<body>
+<body class="catalog-page">
 <header class="nav">
   <div class="container nav-inner">
     <a class="brand" href="/.github/" aria-label="Victron Venus home">
-      <img src="assets/img/logo.png" alt="" width="22" height="22" class="brand-logo">
+      <img src="/.github/assets/img/logo.png" alt="" width="22" height="22" class="brand-logo">
       victron-venus
     </a>
     <nav class="nav-links" aria-label="Main navigation">
-      <a href="/.github/projects.html">projects</a>
-      <a href="/.github/wiki/">wiki</a>
+      <a href="/.github/projects.html">Projects</a>
+      <a href="/.github/wiki/">Docs</a>
       <a class="nav-gh" href="https://github.com/victron-venus">GitHub&nbsp;↗</a>
     </nav>
+<details class="mobile-nav"><summary>Menu</summary><nav class="mobile-links" aria-label="Mobile navigation">
+      <a href="/.github/projects.html">Projects</a>
+      <a href="/.github/wiki/">Docs</a>
+      <a class="nav-gh" href="https://github.com/victron-venus">GitHub&nbsp;↗</a>
+    </nav></details><details class="doc-search"><summary aria-label="Search documentation">Search ↗</summary><div class="search-panel"><label for="docs-query">Search the documentation</label><input id="docs-query" type="search" placeholder="Try MQTT, battery or install" autocomplete="off"><p class="search-status" role="status">Enter a topic to find a guide.</p><ul class="search-results"></ul><a href="/.github/wiki/">Browse all guides →</a></div></details>
   </div>
 </header>
 
@@ -40,5 +42,6 @@
 </main>
 
 <script src="/.github/assets/js/main.js"></script>
+<script src="/.github/assets/js/site.js" defer></script>
 </body>
 </html>

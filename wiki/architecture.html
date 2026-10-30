@@ -5,16 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Architecture — Victron Venus Wiki</title>
 <meta name="description" content="The five layers of the victron-venus ecosystem: sensing, D-Bus services, control and policy, MQTT distribution, and dashboards/observability — and why the split exists.">
-<link rel="canonical" href="https://victron-venus.github.io/wiki/architecture.html">
-<meta name="robots" content="noindex">
-<meta name="theme-color" content="#0a1628">
+<link rel="canonical" href="https://victron-venus.github.io/.github/wiki/architecture.html">
+<meta name="theme-color" content="#151715">
 <link rel="icon" type="image/png" href="../assets/img/logo.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/style.css">
 </head>
-<body>
+<body class="docs-page">
 <a class="skip-link" href="#main">Skip to content</a>
 
 <header class="nav">
@@ -24,18 +20,24 @@
       victron-venus
     </a>
     <nav class="nav-links" aria-label="Main navigation">
-      <a href="../projects.html">projects</a>
-      <a href="architecture.html" aria-current="page">architecture</a>
-      <a href="./">wiki</a>
+      <a href="../projects.html">Projects</a>
+      <a href="architecture.html" aria-current="page">Architecture</a>
+      <a href="./">Docs</a>
       <a class="nav-gh" href="https://github.com/victron-venus">GitHub&nbsp;↗</a>
     </nav>
+<details class="mobile-nav"><summary>Menu</summary><nav class="mobile-links" aria-label="Mobile navigation">
+      <a href="../projects.html">Projects</a>
+      <a href="architecture.html" aria-current="page">Architecture</a>
+      <a href="./">Docs</a>
+      <a class="nav-gh" href="https://github.com/victron-venus">GitHub&nbsp;↗</a>
+    </nav></details><details class="doc-search"><summary aria-label="Search documentation">Search ↗</summary><div class="search-panel"><label for="docs-query">Search the documentation</label><input id="docs-query" type="search" placeholder="Try MQTT, battery or install" autocomplete="off"><p class="search-status" role="status">Enter a topic to find a guide.</p><ul class="search-results"></ul><a href="../wiki/">Browse all guides →</a></div></details>
   </div>
 </header>
 
 <main id="main" class="container section">
 <div class="wiki-layout">
 
-<nav class="wiki-nav" aria-label="Wiki navigation">
+<details class="wiki-drawer"><summary>Guides &amp; page contents</summary><nav class="wiki-nav" aria-label="Wiki navigation">
   <span class="wn-label">Wiki</span>
   <a href="./">Overview</a>
   <a href="install.html">Install guide</a>
@@ -43,7 +45,7 @@
   <a href="integration.html">Venus OS integration</a>
   <a href="ci-standards.html">CI standards</a>
   <a href="contributing.html">Contributing</a>
-</nav>
+</nav></details>
 
 <article class="prose">
 <p class="eyebrow">02 · Architecture</p>
@@ -52,7 +54,7 @@
 Bridges and companion applications use MQTT, HTTP or WebSockets according to
 their own integration contracts. The repository map is not a live deployment inventory.</p>
 
-<h2>The five layers</h2>
+<h2 id="section-1">The five layers</h2>
 
 <div class="layers">
   <div class="layer">
@@ -87,7 +89,7 @@ their own integration contracts. The repository map is not a live deployment inv
 <p>The stock <strong>GUI v2 Switch pane</strong> and <strong>VRM Remote Console</strong> can show its optional temperature slider and Heat/Off selector through the Switchable Output API on the same temperature device. Observation is the default; manual controls and automatic preheating are enabled separately. HA requests run outside the D-Bus loop and the separate ESS controller.</p>
 <p>The native path needs no companion gateway or GUI patch, while Nest still relies on HA and its cloud integration. For a gas furnace, the configured heating-power estimate describes electrical demand; it does not measure heat or gas and is not published as another AC load. See the <a href="install.html#inverter-climate">installation and control guide</a>.</p>
 
-<h2>Why two buses instead of one</h2>
+<h2 id="section-3">Why two buses instead of one</h2>
 <p>D-Bus is how Venus OS models batteries, PV inverters and grid meters as
 <code>com.victronenergy.*</code> services. The ESS controller reads and writes that local bus.</p>
 <p>Companion dashboards, Home Assistant, Grafana and forecasters use MQTT, HTTP or
@@ -96,7 +98,7 @@ inverter-climate reach Home Assistant over its REST API, while the GX-facing
 temperature device and GUI controls use D-Bus. Validate freshness and command
 acknowledgements at each boundary.</p>
 
-<h2>Control path vs telemetry path</h2>
+<h2 id="section-4">Control path vs telemetry path</h2>
 <div class="table-scroll">
 <table>
   <thead><tr><th></th><th>Control path (amber)</th><th>Telemetry path (cyan)</th></tr></thead>
@@ -110,7 +112,7 @@ acknowledgements at each boundary.</p>
 </table>
 </div>
 
-<h2>Cross-cutting concerns</h2>
+<h2 id="section-5">Cross-cutting concerns</h2>
 <ul>
   <li><strong>Forecasting:</strong> optional forecast consumers need a configured, tested control contract; repository availability alone does not close a control loop.</li>
   <li><strong>AI access:</strong> mcp-venus-os provides its own validation and write-confirmation rules. Verify its deployment and transport separately from the controller.</li>
@@ -131,5 +133,6 @@ acknowledgements at each boundary.</p>
 </footer>
 
 <script src="../assets/js/main.js"></script>
+<script src="../assets/js/site.js" defer></script>
 </body>
 </html>
