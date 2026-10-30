@@ -29,6 +29,7 @@
         const link = document.createElement('a');
         link.href = new URL(entry.url, root).href;
         link.textContent = entry.title;
+        link.addEventListener('click', () => { search.open = false; });
         const excerpt = document.createElement('small');
         excerpt.textContent = entry.text.slice(0, 145) + (entry.text.length > 145 ? '…' : '');
         link.append(excerpt); item.append(link); results.append(item);

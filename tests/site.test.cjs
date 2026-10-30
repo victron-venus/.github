@@ -55,7 +55,7 @@ function page() {
     },
   }, { filename: "assets/js/site.js" });
   return {
-    results, status, requests,
+    results, status, requests, search,
     type(value) { input.value = value; return input.listeners.input(); },
     links() { return results.children.map((row) => row.children[0]); },
   };
@@ -112,4 +112,15 @@ test("a later search retries a failed index request and then reuses the successf
       assert.deepEqual(view.links().map((link) => link.textContent), ["Battery setup"]);
     });
   }
+});
+
+
+test("following a result closes the search panel for same-page anchors", async () => {
+  const view = page();
+  view.search.open = true;
+  const pending = view.type("battery");
+  view.requests[0].succeed();
+  await pending;
+  view.links()[0].listeners.click();
+  assert.equal(view.search.open, false);
 });
