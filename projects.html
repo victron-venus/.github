@@ -10,14 +10,11 @@
 <meta property="og:title" content="Projects — Victron Venus">
 <meta property="og:description" content="Public projects for Victron Energy systems on Venus OS.">
 <meta property="og:url" content="https://victron-venus.github.io/.github/projects.html">
-<meta name="theme-color" content="#0a1628">
+<meta name="theme-color" content="#151715">
 <link rel="icon" type="image/png" href="assets/img/logo.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
+<body class="catalog-page">
 <a class="skip-link" href="#main">Skip to content</a>
 
 <header class="nav">
@@ -27,11 +24,17 @@
       victron-venus
     </a>
     <nav class="nav-links" aria-label="Main navigation">
-      <a href="projects.html" aria-current="page">projects</a>
-      <a href="wiki/architecture.html">architecture</a>
-      <a href="wiki/">wiki</a>
+      <a href="projects.html" aria-current="page">Projects</a>
+      <a href="wiki/architecture.html">Architecture</a>
+      <a href="wiki/">Docs</a>
       <a class="nav-gh" href="https://github.com/victron-venus">GitHub&nbsp;↗</a>
     </nav>
+<details class="mobile-nav"><summary>Menu</summary><nav class="mobile-links" aria-label="Mobile navigation">
+      <a href="projects.html" aria-current="page">Projects</a>
+      <a href="wiki/architecture.html">Architecture</a>
+      <a href="wiki/">Docs</a>
+      <a class="nav-gh" href="https://github.com/victron-venus">GitHub&nbsp;↗</a>
+    </nav></details><details class="doc-search"><summary aria-label="Search documentation">Search ↗</summary><div class="search-panel"><label for="docs-query">Search the documentation</label><input id="docs-query" type="search" placeholder="Try MQTT, battery or install" autocomplete="off"><p class="search-status" role="status">Enter a topic to find a guide.</p><ul class="search-results"></ul><a href="wiki/">Browse all guides →</a></div></details>
   </div>
 </header>
 
@@ -379,5 +382,6 @@
 </footer>
 
 <script src="assets/js/main.js"></script>
+<script src="assets/js/site.js" defer></script>
 </body>
 </html>

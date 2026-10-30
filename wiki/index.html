@@ -5,16 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wiki — Victron Venus</title>
 <meta name="description" content="Documentation hub for the victron-venus ecosystem: install guide, architecture, Venus OS integration patterns, CI standards, and contributing workflow.">
-<link rel="canonical" href="https://victron-venus.github.io/wiki/">
-<meta name="robots" content="noindex">
-<meta name="theme-color" content="#0a1628">
+<link rel="canonical" href="https://victron-venus.github.io/.github/wiki/">
+<meta name="theme-color" content="#151715">
 <link rel="icon" type="image/png" href="../assets/img/logo.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/style.css">
 </head>
-<body>
+<body class="docs-page">
 <a class="skip-link" href="#main">Skip to content</a>
 
 <header class="nav">
@@ -24,11 +20,17 @@
       victron-venus
     </a>
     <nav class="nav-links" aria-label="Main navigation">
-      <a href="../projects.html">projects</a>
-      <a href="architecture.html">architecture</a>
-      <a href="./" aria-current="page">wiki</a>
+      <a href="../projects.html">Projects</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="./" aria-current="page">Docs</a>
       <a class="nav-gh" href="https://github.com/victron-venus">GitHub&nbsp;↗</a>
     </nav>
+<details class="mobile-nav"><summary>Menu</summary><nav class="mobile-links" aria-label="Mobile navigation">
+      <a href="../projects.html">Projects</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="./" aria-current="page">Docs</a>
+      <a class="nav-gh" href="https://github.com/victron-venus">GitHub&nbsp;↗</a>
+    </nav></details><details class="doc-search"><summary aria-label="Search documentation">Search ↗</summary><div class="search-panel"><label for="docs-query">Search the documentation</label><input id="docs-query" type="search" placeholder="Try MQTT, battery or install" autocomplete="off"><p class="search-status" role="status">Enter a topic to find a guide.</p><ul class="search-results"></ul><a href="../wiki/">Browse all guides →</a></div></details>
   </div>
 </header>
 
@@ -41,15 +43,15 @@
 </div>
 
 <div class="prose">
-  <h2>Where to start</h2>
+  <h2 id="section-1">Where to start</h2>
   <ol class="step-list">
-    <li><strong>Skim the <a href="architecture.html">architecture</a></strong> — five layers, two buses (D-Bus on-device, MQTT everywhere else). Two minutes well spent before installing anything.</li>
+    <li><strong>Skim the <a href="architecture.html">Architecture</a></strong> — five layers, two buses (D-Bus on-device, MQTT everywhere else). Two minutes well spent before installing anything.</li>
     <li><strong>Follow the <a href="install.html">install guide</a></strong> for your hardware layer. Each step is independent; adopt only what you need.</li>
     <li><strong>Dive into <a href="integration.html">Venus OS integration</a></strong> when writing your own service — service naming, MQTT topics, PackageManager installs.</li>
     <li><strong>Before your first PR, read <a href="contributing.html">contributing</a></strong> and the <a href="ci-standards.html">CI standards</a> every repo here follows.</li>
   </ol>
 
-  <h2>All pages</h2>
+  <h2 id="section-2">All pages</h2>
   <p>Read the <a href="https://github.com/victron-venus/.github/blob/main/docs/VENUS-AUDIT-CLOSURE-2026-09-12.md">September 2026 service audit closure</a> for verified deployment fixes, meter-exchange evidence and validation limits.</p>
   <div class="wiki-cards">
     <a class="wcard" href="install.html"><span class="wn-num">01</span><h3>Install guide</h3><p>Layer-by-layer setup from flashing an ESP32 to a running dashboard.</p></a>
@@ -104,5 +106,6 @@
 </footer>
 
 <script src="../assets/js/main.js"></script>
+<script src="../assets/js/site.js" defer></script>
 </body>
 </html>

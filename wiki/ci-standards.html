@@ -5,16 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CI standards — Victron Venus Wiki</title>
 <meta name="description" content="CI/CD standards for victron-venus projects: reusable workflows from venus-os-ci-toolkit, SHA pinning, runner hardening, release rules, and version sync.">
-<link rel="canonical" href="https://victron-venus.github.io/wiki/ci-standards.html">
-<meta name="robots" content="noindex">
-<meta name="theme-color" content="#0a1628">
+<link rel="canonical" href="https://victron-venus.github.io/.github/wiki/ci-standards.html">
+<meta name="theme-color" content="#151715">
 <link rel="icon" type="image/png" href="../assets/img/logo.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/style.css">
 </head>
-<body>
+<body class="docs-page">
 <a class="skip-link" href="#main">Skip to content</a>
 
 <header class="nav">
@@ -24,18 +20,24 @@
       victron-venus
     </a>
     <nav class="nav-links" aria-label="Main navigation">
-      <a href="../projects.html">projects</a>
-      <a href="architecture.html">architecture</a>
-      <a href="./" aria-current="page">wiki</a>
+      <a href="../projects.html">Projects</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="./" aria-current="page">Docs</a>
       <a class="nav-gh" href="https://github.com/victron-venus">GitHub&nbsp;↗</a>
     </nav>
+<details class="mobile-nav"><summary>Menu</summary><nav class="mobile-links" aria-label="Mobile navigation">
+      <a href="../projects.html">Projects</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="./" aria-current="page">Docs</a>
+      <a class="nav-gh" href="https://github.com/victron-venus">GitHub&nbsp;↗</a>
+    </nav></details><details class="doc-search"><summary aria-label="Search documentation">Search ↗</summary><div class="search-panel"><label for="docs-query">Search the documentation</label><input id="docs-query" type="search" placeholder="Try MQTT, battery or install" autocomplete="off"><p class="search-status" role="status">Enter a topic to find a guide.</p><ul class="search-results"></ul><a href="../wiki/">Browse all guides →</a></div></details>
   </div>
 </header>
 
 <main id="main" class="container section">
 <div class="wiki-layout">
 
-<nav class="wiki-nav" aria-label="Wiki navigation">
+<details class="wiki-drawer"><summary>Guides &amp; page contents</summary><nav class="wiki-nav" aria-label="Wiki navigation">
   <span class="wn-label">Wiki</span>
   <a href="./">Overview</a>
   <a href="install.html">Install guide</a>
@@ -43,7 +45,7 @@
   <a href="integration.html">Venus OS integration</a>
   <a href="ci-standards.html" aria-current="page">CI standards</a>
   <a href="contributing.html">Contributing</a>
-</nav>
+</nav></details>
 
 <article class="prose">
 <p class="eyebrow">04 · CI / CD</p>
@@ -54,7 +56,7 @@ provides shared workflows and release tooling. Each project defines its own
 validation commands and artifact requirements; follow its checked-in contribution
 and release guides.</p>
 
-<h2>Reusable workflows and tools</h2>
+<h2 id="section-1">Reusable workflows and tools</h2>
 <div class="table-scroll">
 <table>
   <thead><tr><th>Workflow or tool</th><th>Purpose</th></tr></thead>
@@ -72,7 +74,7 @@ and release guides.</p>
   test:
     uses: victron-venus/venus-os-ci-toolkit/.github/workflows/python-ci.yml@875762362bb31b4899bf02fdf9e835188dc5eb80</code></pre>
 
-<h2>Non-negotiable rules</h2>
+<h2 id="section-2">Non-negotiable rules</h2>
 <ul>
   <li><strong>Pin everything.</strong> Every <code>uses:</code> in every workflow resolves to a full
   commit SHA — never a tag or branch. Tags move; SHAs don't. This is the supply-chain boundary.</li>
@@ -90,7 +92,7 @@ and release guides.</p>
   Keep approval jobs metadata-only and preserve the documented eligibility checks.</li>
 </ul>
 
-<h2>Releases</h2>
+<h2 id="section-3">Releases</h2>
 <p>Application repositories use their <code>.release-policy.json</code>,
 <code>RELEASING.md</code> and <code>docs/release-workflow.md</code> to define checks,
 artifacts and release channels. The release pipeline creates immutable beta and
@@ -103,7 +105,7 @@ community repositories run validation and explicit deployment instead of
 application release channels. See the
 <a href="https://github.com/victron-venus/.github/blob/main/docs/CI_CD_STRATEGY.md">organization release overview</a>.</p>
 
-<h2>Version synchronization</h2>
+<h2 id="section-4">Version synchronization</h2>
 <p>Review base-version changes through a pull request. The target repository's
 release policy declares which version files must agree; projects do not all use
 the same file names or package format. Release tooling allocates candidate
@@ -129,5 +131,6 @@ rather than manually changing a version and pushing a tag.</p>
 </footer>
 
 <script src="../assets/js/main.js"></script>
+<script src="../assets/js/site.js" defer></script>
 </body>
 </html>

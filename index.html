@@ -11,11 +11,8 @@
 <meta property="og:description" content="Grid-zero control, battery/PV bridges, live dashboards, forecasting, and observability for Venus OS. Public project catalog and deployment guides.">
 <meta property="og:url" content="https://victron-venus.github.io/.github/">
 <meta name="twitter:card" content="summary">
-<meta name="theme-color" content="#0a1628">
+<meta name="theme-color" content="#151715">
 <link rel="icon" type="image/png" href="assets/img/logo.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 <script type="application/ld+json">
 {
@@ -32,7 +29,7 @@
 }
 </script>
 </head>
-<body>
+<body class="home-page">
 <a class="skip-link" href="#main">Skip to content</a>
 
 <header class="nav">
@@ -42,28 +39,39 @@
       victron-venus
     </a>
     <nav class="nav-links" aria-label="Main navigation">
-      <a href="projects.html">projects</a>
-      <a href="wiki/architecture.html">architecture</a>
-      <a href="wiki/">wiki</a>
+      <a href="projects.html">Projects</a>
+      <a href="wiki/architecture.html">Architecture</a>
+      <a href="wiki/">Docs</a>
       <a class="nav-gh" href="https://github.com/victron-venus">GitHub&nbsp;↗</a>
     </nav>
+<details class="mobile-nav"><summary>Menu</summary><nav class="mobile-links" aria-label="Mobile navigation">
+      <a href="projects.html">Projects</a>
+      <a href="wiki/architecture.html">Architecture</a>
+      <a href="wiki/">Docs</a>
+      <a class="nav-gh" href="https://github.com/victron-venus">GitHub&nbsp;↗</a>
+    </nav></details><details class="doc-search"><summary aria-label="Search documentation">Search ↗</summary><div class="search-panel"><label for="docs-query">Search the documentation</label><input id="docs-query" type="search" placeholder="Try MQTT, battery or install" autocomplete="off"><p class="search-status" role="status">Enter a topic to find a guide.</p><ul class="search-results"></ul><a href="wiki/">Browse all guides →</a></div></details>
   </div>
 </header>
 
 <main id="main">
 
 <section class="hero container">
-  <p class="eyebrow">Open source · Venus OS</p>
-  <h1>Your Victron installation, <em>wired for open control.</em></h1>
-  <p class="hero-sub">Grid-zero feed-in control, battery and PV bridges over D-Bus, live dashboards,
-  solar forecasting, and end-to-end observability &mdash; a complete open stack running on Cerbo GX
-  and Venus OS.</p>
-  <div class="cta-row">
-    <a class="btn btn-primary" href="#featured">Browse the stack</a>
-    <a class="btn btn-ghost" href="wiki/install.html">Install guide</a>
-    <a class="btn btn-ghost" href="wiki/architecture.html">How it fits together</a>
-  </div>
-
+<div class="hero-layout"><div class="hero-copy">
+<p class="eyebrow"><span class="status-dot"></span> Independent. Open source. Yours.</p>
+<h1>Know your energy.<br><em>Own the control.</em></h1>
+<p class="hero-sub">Connect the measurements. See the whole system. Build the control you need — with open tools for Victron Venus OS.</p>
+<div class="cta-row"><a class="btn btn-primary" href="wiki/install.html">Find your starting point ↗</a><a class="btn btn-ghost" href="projects.html">Explore the projects</a></div>
+<p class="hero-note">From one sensor to a connected installation.<br>Adopt only the parts you need.</p>
+</div><figure class="hero-art"><img src="assets/img/energy-system.svg" alt="Solar, battery and grid measurements meet at a Venus OS controller, with separate views for monitoring and control." width="640" height="580"><figcaption>A connected system. Clearly separated roles.</figcaption></figure></div>
+</section>
+<section class="path-section container" aria-labelledby="choose-path">
+<div class="section-heading"><p class="eyebrow">A useful first step</p><h2 id="choose-path">What would you like to do?</h2></div>
+<div class="path-list">
+<a href="wiki/install.html"><span class="path-number">01</span><span><strong>Connect a device</strong><small>Choose a sensor or service and follow its installation guide.</small></span><span class="path-arrow" aria-hidden="true">↗</span></a>
+<a href="projects.html"><span class="path-number">02</span><span><strong>Find the right tool</strong><small>Browse control, dashboards, D-Bus bridges and companion apps.</small></span><span class="path-arrow" aria-hidden="true">↗</span></a>
+<a href="wiki/architecture.html"><span class="path-number">03</span><span><strong>Understand the system</strong><small>See what runs on the GX, what runs elsewhere, and how they connect.</small></span><span class="path-arrow" aria-hidden="true">↗</span></a>
+</div></section>
+<section class="system-section container" aria-labelledby="system-heading"><div class="section-heading"><p class="eyebrow">The bigger picture</p><h2 id="system-heading">One installation.<br>Many good connections.</h2><p>Measurements enter through dedicated bridges. Local control stays on Venus OS. Dashboards and companion services help you understand what happens next.</p></div>
   <!-- One-line diagram: amber = power/measurement, cyan = data -->
   <div class="diagram-wrap">
     <svg class="diagram" viewBox="0 0 1140 430" role="img"
@@ -154,7 +162,7 @@
   <div class="container">
     <div class="sec-head">
       <p class="eyebrow">Flagship</p>
-      <h2>Six projects that carry the system</h2>
+      <h2>Small tools.<br>Purposeful building blocks.</h2>
       <p>These projects cover control, telemetry, interfaces and development tooling. Deployment and device verification vary by component; see the <a href="https://github.com/victron-venus/.github/blob/main/docs/DEPLOYMENT-EVIDENCE.md">documented evidence and remaining checks</a>.</p>
     </div>
     <div class="grid-cards">
@@ -197,8 +205,8 @@
   <div class="container">
     <div class="sec-head">
       <p class="eyebrow">Wiki</p>
-      <h2>From empty Cerbo to full stack</h2>
-      <p>The docs assume one Cerbo GX, some hardware to sense with, and an afternoon.</p>
+      <h2>A guide for every next step.</h2>
+      <p>Start with your hardware and the role you need. Each guide explains the connections, installation steps and checks before enabling control.</p>
     </div>
     <div class="wiki-cards">
       <a class="wcard" href="wiki/install.html"><span class="wn-num">01</span><h3>Install guide</h3><p>Layer-by-layer setup, from flashing an ESP32 to a running dashboard.</p></a>
@@ -250,5 +258,6 @@
 </footer>
 
 <script src="assets/js/main.js"></script>
+<script src="assets/js/site.js" defer></script>
 </body>
 </html>
