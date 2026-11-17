@@ -1,54 +1,47 @@
 # Public documentation site
 
-The site at <https://victron-venus.github.io/.github/> introduces the public
-projects and presents the guides in `wiki/`. It is separate from GitHub's built-in
-Wiki, whose page styling is controlled by GitHub.
+The maintained site is <https://victron-venus.github.io/>, published from the separate
+[`victron-venus.github.io`](https://github.com/victron-venus/victron-venus.github.io) repository. It
+is a single page with the project catalog and the guides, plus a local search index. It is separate
+from GitHub's built-in Wiki, whose page styling is controlled by GitHub.
 
-## Content and design
+This repository no longer publishes a second copy of that site. It keeps redirect stubs so
+historical links keep working, and those stubs carry `noindex` so only the maintained site appears
+in search results.
 
-- `index.html`: introduction, task-based entry points and a system diagram.
-- `projects.html`: project catalog with optional filtering.
-- `wiki/*.html`: installation, architecture, integration and contribution guides.
-- `assets/css/style.css`: shared layout, dark overview and light reading palettes.
-- `assets/img/energy-system.svg`: an original conceptual diagram, not telemetry,
-  a hardware photograph or a promise of supported wiring.
-- `assets/js/site.js`: local search, heading navigation and copy-code controls.
-- `assets/js/main.js`: catalog filters, diagram interaction and optional translation.
+## Redirect stubs
 
-Content and navigation work without JavaScript. Search and copy buttons are
-progressive enhancements. No remote fonts, UI libraries or analytics are needed.
-Google Translate remains opt-in. Motion respects reduced-motion preferences.
-Print styles remove controls and retain guide content.
+Each stub names an exact target and declares a matching canonical link:
 
-Keep compatibility requirements and operating limits in the text. Never present
-a sample graph as live data. Only link projects already public; local settings
-and private repository names are not site content.
+| Stub | Target |
+| --- | --- |
+| `index.html` | <https://victron-venus.github.io/> |
+| `projects.html` | <https://victron-venus.github.io/#projects> |
+| `wiki/index.html` | <https://victron-venus.github.io/#docs> |
+| `wiki/install.html` | <https://victron-venus.github.io/#install> |
+| `wiki/architecture.html` | <https://victron-venus.github.io/#architecture> |
+| `wiki/integration.html` | <https://victron-venus.github.io/#integration> |
+| `wiki/ci-standards.html` | <https://victron-venus.github.io/#ci> |
+| `wiki/contributing.html` | <https://victron-venus.github.io/#contributing> |
 
-## Edit and validate
+`404.html` is a minimal error page that points at the maintained site. It has no CSS, JavaScript or
+local assets, so nothing here can drift from the palette or behaviour of the published site.
 
-Edit HTML and retain existing section IDs so shared links keep working. Give new
-guide sections stable IDs on their `h2`. After changing a guide, regenerate search:
+## Editing
+
+Content and design live in the `victron-venus.github.io` repository. Only touch these stubs when an
+anchor on the maintained site is renamed. Keep the `<link rel="canonical">` href, the `refresh`
+target and the `location.replace` target identical, then run:
 
 ```sh
-python3 scripts/build-search-index.py
 bash scripts/ci.sh
 ```
 
-Checks reject stale search content, duplicate IDs, missing local navigation or
-search anchors, missing assets and direct third-party page dependencies. The
-JavaScript tests also check preservation of translation consent.
+The check rejects a stub whose target disagrees with its canonical link, a stub that reintroduces
+local assets or scripts, and a stub missing `noindex`.
 
-Preview the public site files with a loopback HTTP server. Check the home page,
-project filters, guide search and a long guide at desktop and narrow phone widths.
-Use the menu and search with a keyboard. A result must open its exact section;
-Escape should close search; empty results should give a useful message. Disabling
-JavaScript must leave the content and navigation usable.
+## Publication boundary
 
-## Publish and recover
-
-Pages publishes the repository's configured source after merge. Check the Pages
-deployment result and the live home, catalog and guides: a merge alone does not
-confirm publication. Existing URLs stay unchanged.
-
-Revert a presentation regression through a reviewed PR. Preserve documentation
-and existing anchors; rebuild search if the reverted change affects guide text.
+Only link projects that are already public. Local settings and private repository names are not
+organization docs. Keep compatibility requirements and operating limits in the text, and never
+present a sample graph as live data.

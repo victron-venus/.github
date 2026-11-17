@@ -5,8 +5,11 @@ organization. Two jobs:
 
 1. **Organization profile** — `profile/README.md` (shown on the org page), community health files,
    and issue templates.
-2. **Organization website** — served by GitHub Pages at
-   **[https://victron-venus.github.io/.github/](https://victron-venus.github.io/.github/)** (the root https://victron-venus.github.io/ redirects there via the `victron-venus.github.io` repo) from the root of `main`.
+2. **Redirect stubs** — the historical site paths (`index.html`, `projects.html`, `wiki/*.html`)
+   now redirect to the single maintained site at
+   **[https://victron-venus.github.io/](https://victron-venus.github.io/)**, which is served from the
+   separate `victron-venus.github.io` repository. There is no second copy of the catalog or the
+   guides here; a stale duplicate used to compete with the root site in search results.
 
 <!-- ci-release-process:start -->
 ## CI and deployment
@@ -14,34 +17,35 @@ organization. Two jobs:
 See [CI and deployment workflow](docs/release-workflow.md) for required checks and local commands. This repository uses validation-only policy; application release channels do not apply.
 <!-- ci-release-process:end -->
 
-## Website structure
+## Repository layout
 
 ```
-index.html          Landing page with animated one-line system diagram + flagship projects
-projects.html       Public project catalog, including archived replacements (filter + search)
-wiki/               Documentation hub
-  install.html      Layer-by-layer full-stack install guide
-  architecture.html The five layers, D-Bus vs MQTT split
-  integration.html  Venus OS conventions: service naming, topics, packaging
-  ci-standards.html Reusable workflows, pinning policy, release rules
-  contributing.html PR flow, conventional commits, local checks
-404.html            "Open circuit" error page
-assets/             CSS, JS, favicon — no build step, no framework
-.nojekyll           Serve static files as-is, skip Jekyll processing
-sitemap.xml         Submitted via robots.txt
+profile/README.md   Organization profile shown on the GitHub org page
+docs/               Organization-level documents (install, CI strategy, evidence, quality)
+index.html          Redirect stub -> https://victron-venus.github.io/
+projects.html       Redirect stub -> https://victron-venus.github.io/#projects
+wiki/*.html         Redirect stubs -> the matching anchors on the maintained site
+404.html            Minimal error page pointing at the maintained site
+scripts/            Local validation entry point (scripts/ci.sh) and release helpers
+tests/              Publishing-contract tests for the redirect stubs
 ```
 
-The site uses static HTML/CSS/JS with no build dependencies. Google Translate loads only after an explicit language choice; a locally remembered consent and language can restore that choice on later pages. Choosing Original revokes that consent. Edit files through a pull request; Pages redeploys when the change reaches `main`.
+The redirects keep historical links working and carry `noindex`, so only one copy of the
+catalog appears in search results.
+
+The stubs are plain HTML with no scripts, stylesheets or build step, so they cannot drift from the
+maintained site: each one names the exact target URL and canonical link. Edit them through a pull
+request as part of an organization docs change.
 
 ## Pages enablement
 
-Settings → Pages → *Deploy from a branch* → `main` / `/ (root)`. One-time setup; after that every
-push redeploys.
+The canonical site is published from the `victron-venus.github.io` repository. Stubs here rely on
+that repository's Pages deployment; keep the target URLs in the stubs aligned with its anchors.
 
 ## Keeping the catalog current
 
-Update `profile/README.md` and `projects.html` together when a public project is
-added, moved or archived. Keep related links in installation and architecture
+Update `profile/README.md` and the catalog in the `victron-venus.github.io` repository when a
+public project is added, moved or archived. Keep related links in installation and architecture
 guides aligned with the maintained implementation. Keep deployment claims tied to
 the dated, scoped records in [the evidence index](docs/DEPLOYMENT-EVIDENCE.md);
 a release or passing CI is not a current fleet inventory. Verify repository visibility
@@ -49,8 +53,8 @@ before publishing any name or URL; see [contribution rules](CONTRIBUTING.md).
 
 ## Docs
 
-Long-form docs live in [`docs/`](docs/) (`INSTALL.md`, `CI_CD_STRATEGY.md`) and are summarized into
-the website wiki. Contributing rules are in [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Long-form organization docs live in [`docs/`](docs/) (`INSTALL.md`, `CI_CD_STRATEGY.md`).
+Published guides are maintained in the `victron-venus.github.io` repository. Contributing rules are in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ---
 
@@ -68,4 +72,7 @@ See [governance](GOVERNANCE.md), [Code of Conduct](CODE_OF_CONDUCT.md), [roadmap
 
 ## Public website
 
-The [Pages site](https://victron-venus.github.io/.github/) includes the project catalog and searchable guides. See [editing, validation and publication](docs/PUBLIC_SITE.md) for maintenance.
+The maintained site is <https://victron-venus.github.io/> — it holds the project catalog, the
+guides and the offline search index. Website editing, validation and publication are documented in
+that repository; this repository only redirects to it. See [docs/PUBLIC_SITE.md](docs/PUBLIC_SITE.md)
+for what each stub maps to.

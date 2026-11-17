@@ -1,85 +1,71 @@
-"""Publishing contracts: local navigation, stable search anchors and asset bounds."""
-import importlib.util
-import json
+"""Publishing contract: this repository redirects to the maintained site.
+
+The organization site is served from ``victron-venus.github.io``. This
+repository keeps stable redirect stubs so historical links keep working, and
+must not publish a second, competing copy of the catalog or the guides.
+"""
 from html.parser import HTMLParser
 from pathlib import Path
 import unittest
-from urllib.parse import unquote, urlsplit
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
-SPEC = importlib.util.spec_from_file_location('site_index', ROOT / 'scripts/build-search-index.py')
-INDEX = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(INDEX)
+SITE = 'https://victron-venus.github.io/'
+
+REQUIRED_REDIRECTS = {
+    'index.html': SITE,
+    'projects.html': SITE + '#projects',
+    'wiki/index.html': SITE + '#docs',
+    'wiki/install.html': SITE + '#install',
+    'wiki/architecture.html': SITE + '#architecture',
+    'wiki/integration.html': SITE + '#integration',
+    'wiki/ci-standards.html': SITE + '#ci',
+    'wiki/contributing.html': SITE + '#contributing',
+}
 
 
 class Page(HTMLParser):
     def __init__(self, text):
         super().__init__()
-        self.ids, self.links, self.resources = [], [], []
+        self.canonical, self.refresh, self.resources = None, None, []
         self.feed(text)
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
-        if 'id' in attrs:
-            self.ids.append(attrs['id'])
-        if tag == 'a' and 'href' in attrs:
-            self.links.append(attrs['href'])
+        if tag == 'link' and attrs.get('rel') == 'canonical':
+            self.canonical = attrs.get('href')
+        if tag == 'meta' and attrs.get('http-equiv') == 'refresh':
+            self.refresh = attrs.get('content', '')
         if tag in ('script', 'img') and attrs.get('src'):
             self.resources.append(attrs['src'])
         if tag == 'link' and attrs.get('rel') == 'stylesheet':
-            self.resources.append(attrs['href'])
+            self.resources.append(attrs.get('href'))
 
 
-class PublicSiteTests(unittest.TestCase):
-    def test_index_is_current(self):
-        self.assertEqual((ROOT / 'assets/search-index.json').read_text(), INDEX.build())
+class RedirectSiteTests(unittest.TestCase):
+    def test_every_legacy_path_is_a_redirect_to_the_site(self):
+        for name, target in REQUIRED_REDIRECTS.items():
+            page = Page((ROOT / name).read_text())
+            self.assertEqual(page.canonical, target, name)
+            self.assertIn(target, page.refresh or '', name)
 
-    def test_index_anchors_exist_without_javascript(self):
-        entries = json.loads(INDEX.build())
-        self.assertGreater(len(entries), 15)
-        for entry in entries:
-            url = urlsplit(entry['url'])
-            self.assertFalse(url.scheme or url.netloc)
-            page = Page((ROOT / url.path).read_text())
-            if url.fragment:
-                self.assertIn(url.fragment, page.ids, entry['url'])
-        self.assertTrue(any('battery' in e['text'].lower() for e in entries))
-
-    def test_public_pages_have_local_assets_and_no_duplicate_ids(self):
-        for path in [*ROOT.glob('*.html'), *(ROOT / 'wiki').glob('*.html')]:
-            page = Page(path.read_text())
-            self.assertEqual(len(page.ids), len(set(page.ids)), path.name)
+    def test_no_competing_content_or_assets_are_published(self):
+        self.assertFalse((ROOT / 'assets').exists())
+        self.assertFalse((ROOT / 'assets/search-index.json').exists())
+        for name in REQUIRED_REDIRECTS:
+            page = Page((ROOT / name).read_text())
             for value in page.resources:
                 url = urlsplit(value)
-                self.assertFalse(url.netloc or url.scheme, value)
-                target = ROOT / unquote(url.path.removeprefix('/.github/')) if url.path.startswith('/.github/') else path.parent / unquote(url.path)
-                self.assertTrue(target.is_file(), value)
+                self.assertTrue(url.netloc, f'{name}: local asset {value}')
 
-    def test_local_navigation_keeps_existing_targets(self):
-        for path in [ROOT / 'index.html', ROOT / 'projects.html', *(ROOT / 'wiki').glob('*.html')]:
-            for value in Page(path.read_text()).links:
-                url = urlsplit(value)
-                if url.netloc or url.scheme:
-                    continue
-                target = path.parent / unquote(url.path) if url.path else path
-                if target.is_dir():
-                    target /= 'index.html'
-                self.assertTrue(target.is_file(), f'{path.name}: {value}')
-                if url.fragment:
-                    self.assertIn(unquote(url.fragment), Page(target.read_text()).ids, value)
+    def test_redirects_carry_noindex_and_no_local_scripts(self):
+        for name in [*REQUIRED_REDIRECTS, '404.html']:
+            text = (ROOT / name).read_text()
+            self.assertIn('name="robots" content="noindex"', text, name)
 
-    def test_search_excludes_navigation_and_script(self):
-        parser = INDEX.Sections('guide.html')
-        parser.feed('<main><nav>private nav noise</nav><h1>Guide</h1><p>Intro</p><h2 id="install">Install</h2><p>Read <strong>this</strong>.</p><script>secret()</script></main>')
-        entries = parser.result()
-        self.assertEqual(entries[1]['url'], 'guide.html#install')
-        self.assertEqual(entries[1]['title'], 'Guide · Install')
-        self.assertNotIn('private', json.dumps(entries))
-        self.assertNotIn('secret', json.dumps(entries))
-
-    def test_no_large_hero_or_javascript_dependencies(self):
-        self.assertLess((ROOT / 'assets/img/energy-system.svg').stat().st_size, 12_000)
-        self.assertLess((ROOT / 'assets/js/site.js').stat().st_size, 8_000)
+    def test_404_points_at_the_maintained_site(self):
+        text = (ROOT / '404.html').read_text()
+        self.assertIn('https://victron-venus.github.io/', text)
 
 
 if __name__ == '__main__':

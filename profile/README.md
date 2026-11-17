@@ -39,7 +39,7 @@ flowchart LR
 
 ## Repositories
 
-Browse the [searchable public project catalog](https://victron-venus.github.io/.github/projects.html)
+Browse the [searchable public project catalog](https://victron-venus.github.io/#projects)
 for deployment targets and related tools. Each repository owns its installation
 requirements and release lifecycle; availability here does not imply a live deployment.
 The [deployment evidence index](https://github.com/victron-venus/.github/blob/main/docs/DEPLOYMENT-EVIDENCE.md) links the recorded

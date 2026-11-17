@@ -3,7 +3,7 @@
 Reviewed 12 October 2026. This index describes the scope of published records;
 it is not a live fleet-status page. A newer release does not inherit an older
 installation's verification automatically. Repository counts and presence in
-the [project catalog](https://victron-venus.github.io/.github/projects.html) do
+the [project catalog](https://victron-venus.github.io/#projects) do
 not establish that a component is installed.
 
 ## What each kind of evidence establishes
